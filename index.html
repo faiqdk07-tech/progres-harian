@@ -18,13 +18,13 @@
   --fm:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E; --ink:#FFFFFF; --ink2:#EBEBF5; --muted:#98989F; --sep:#38383A; --fill:rgba(118,118,128,.24); --cellbg:#232325;
+  --bg:#1C1C22; --card:#26262C; --card2:#34343A; --ink:#FFFFFF; --ink2:#EBEBF5; --muted:#98989F; --sep:#38383A; --fill:rgba(118,118,128,.24); --cellbg:#232325;
   --blue:#0A84FF; --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --indigo:#5E5CE6; --pink:#FF375F; --teal:#40C8E0; --purple:#BF5AF2;
   --green-ink:#30D158; --orange-ink:#FFB340; --red-ink:#FF6961; --blue-ink:#409CFF;
   --green-soft:#16301D; --orange-soft:#3A2A10; --red-soft:#3D1715; --blue-soft:#0F2A4A;
   --md:#409CFF; --vl:#DA8FFF; --seg-on:#636366; --glass:rgba(30,30,30,.78); --shadow:rgba(0,0,0,.5); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E; --ink:#FFFFFF; --ink2:#EBEBF5; --muted:#98989F; --sep:#38383A; --fill:rgba(118,118,128,.24); --cellbg:#232325;
+  --bg:#1C1C22; --card:#26262C; --card2:#34343A; --ink:#FFFFFF; --ink2:#EBEBF5; --muted:#98989F; --sep:#38383A; --fill:rgba(118,118,128,.24); --cellbg:#232325;
   --blue:#0A84FF; --green:#30D158; --orange:#FF9F0A; --red:#FF453A; --indigo:#5E5CE6; --pink:#FF375F; --teal:#40C8E0; --purple:#BF5AF2;
   --green-ink:#30D158; --orange-ink:#FFB340; --red-ink:#FF6961; --blue-ink:#409CFF;
   --green-soft:#16301D; --orange-soft:#3A2A10; --red-soft:#3D1715; --blue-soft:#0F2A4A;
@@ -269,15 +269,15 @@ textarea.dump{width:100%;min-height:90px;font:12px var(--fm);border:0;background
   --wall:#ECEEF3; --w1:rgba(140,170,230,.28); --w2:rgba(190,180,225,.22); --w3:rgba(170,200,215,.2); --w4:rgba(160,170,220,.24); --w5:rgba(215,205,195,.18);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --card:rgba(44,44,52,.48); --card2:rgba(255,255,255,.07); --subbg:rgba(255,255,255,.05); --cellbg:rgba(255,255,255,.05);
+  --card:rgba(78,80,94,.5); --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
   --sep:rgba(255,255,255,.12); --line2:rgba(255,255,255,.28); --seg-on:rgba(255,255,255,.2); --on-ink:#000000;
   --glass:rgba(40,40,48,.55); --hl:rgba(255,255,255,.22); --rim:rgba(255,255,255,.12); --drop:rgba(0,0,0,.45);
-  --wall:#0B0C10; --w1:rgba(60,80,140,.32); --w2:rgba(80,70,120,.22); --w3:rgba(50,80,95,.2); --w4:rgba(70,75,130,.25); --w5:rgba(90,80,70,.12)}}
+  --wall:#1E2029; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}}
 :root[data-theme="dark"]{
-  --card:rgba(44,44,52,.48); --card2:rgba(255,255,255,.07); --subbg:rgba(255,255,255,.05); --cellbg:rgba(255,255,255,.05);
+  --card:rgba(78,80,94,.5); --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
   --sep:rgba(255,255,255,.12); --line2:rgba(255,255,255,.28); --seg-on:rgba(255,255,255,.2); --on-ink:#000000;
   --glass:rgba(40,40,48,.55); --hl:rgba(255,255,255,.22); --rim:rgba(255,255,255,.12); --drop:rgba(0,0,0,.45);
-  --wall:#0B0C10; --w1:rgba(60,80,140,.32); --w2:rgba(80,70,120,.22); --w3:rgba(50,80,95,.2); --w4:rgba(70,75,130,.25); --w5:rgba(90,80,70,.12)}
+  --wall:#1E2029; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}
 body{background:var(--wall)}
 body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;background:
   radial-gradient(38% 32% at 12% 8%,var(--w1),transparent 70%),
@@ -317,6 +317,12 @@ body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none
 .wd.ok .wc{background:var(--green)}
 .cal .cd.sel b,.wd.sel .wc{box-shadow:none;outline:2px solid var(--blue);outline-offset:2px}
 .cal .cd.sel:not(.today):not(.ok):not(.pt) b{color:var(--on-ink)}
+.spill{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:6px 13px 6px 10px;border-radius:999px;background:var(--card);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 1px 0 var(--hl),inset 0 0 0 .5px var(--rim),0 8px 22px var(--drop);color:var(--orange)}
+.spill svg{width:18px;height:18px}
+.spill.tot{margin-left:0;color:var(--green)}
+.spill.off{color:var(--muted)}
+.spill b{font:700 18px var(--fd);color:var(--ink);font-variant-numeric:tabular-nums}
+.spill span{font-size:14px;color:var(--muted);font-weight:500}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -500,7 +506,13 @@ const sh = (l, r='') => '<div class="sh"><span>'+l+'</span>'+(r?'<span>'+r+'</sp
 
 /* ---------- Hari Ini ---------- */
 function streakOK(x){ if (pd(x).getDay()===0){ const h = eff('h'+x); return HABITS.every(([f]) => h[f]); } return dayStatus(x)==='Lengkap'; }
-function streak(){ const t = todayStr(); let x = streakOK(t) ? t : addDays(t,-1), n = 0; while (x >= FIRST && streakOK(x)){ n++; x = addDays(x,-1); } return n; }
+/* streak ala Duolingo: jumlah hari lengkap berturut-turut. Hari yang tidak lengkap memutus streak.
+   Hari ini belum lengkap = api abu-abu, streak dari kemarin masih bertahan sampai hari berganti. */
+function dayDone(x){ return dayTasks(x).filter(t => t.done || t.part).length; }
+function streak(){ const t = todayStr(); let n = 0, x = streakOK(t) ? t : addDays(t,-1);
+  while (x >= FIRST && streakOK(x)){ n++; x = addDays(x,-1); }
+  return n; }
+function totalDone(){ const t = todayStr(); let n = 0; for (let x = FIRST; x <= t; x = addDays(x,1)) if (streakOK(x)) n++; return n; }
 function mondayOf(d){ const x = pd(d), n = (x.getDay()+6)%7; return addDays(d, -n); }
 /* ---------- maskot orisinal: "Lumi", gumpalan oranye dengan tunas daun ---------- */
 function mascot(mood, size){ return '';
@@ -558,7 +570,7 @@ function vHari(){
   const nextT = T.find(x => !x.done && !HABITS.some(([,l]) => l===x.l)) || T.find(x => !x.done);
   let html = '<div class="home">';
   html += '<div class="hhead"><div class="hbar"><button class="gb" data-act="day" data-n="-1" aria-label="Hari sebelumnya">‹</button><button class="gb" data-act="day" data-n="1" aria-label="Hari berikutnya">›</button>'+
-    (d!==today?'<button class="gb wide" data-act="today">Hari ini</button>':'')+'<span class="bub">'+bubble+'</span></div>'+
+    (d!==today?'<button class="gb wide" data-act="today">Hari ini</button>':'')+'<span class="spill'+(streakOK(today)?'':' off')+'" title="'+(streakOK(today)?'Streak hari ini sudah menyala':'Selesaikan semua tugas hari ini untuk menyalakan streak')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.2 5.4 4.2 10a4.2 4.2 0 01-8.4 0c0-1.7.8-3 1.8-4 .1 1.6.9 2.6 1.9 3 0-3.4-.7-6.4.5-9z" fill="currentColor"/></svg><b>'+streak()+'</b><span>streak</span></span><span class="spill tot" title="Total hari dengan semua tugas selesai"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>'+totalDone()+'</b><span>selesai</span></span></div>'+
     '<div class="hgreet"><div><h1>'+greet+'</h1><p>'+HARI[dd.getDay()]+', '+dd.getDate()+' '+BULAN[dd.getMonth()]+'</p>'+syncHTML()+'</div>'+mascot(mood, 108)+'</div></div>';
   // tiga kartu ringkas
   const stat = (ic, lab, val, sub) => '<div class="scard">'+icon(ic)+'<span class="sl">'+lab+'</span><b>'+val+'</b><span class="ss">'+sub+'</span></div>';
@@ -571,7 +583,7 @@ function vHari(){
   if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
   // streak minggu ini
   const mon = mondayOf(d), st = streak();
-  html += '<div class="stk"><div class="stkh"><div><b>'+st+' hari beruntun</b><span>Hari lengkap berturut-turut</span></div><button class="gb2" data-act="day" data-n="-7" aria-label="Minggu sebelumnya">‹</button><button class="gb2" data-act="day" data-n="7" aria-label="Minggu berikutnya">›</button></div><div class="wkl">';
+  html += '<div class="stk"><div class="stkh"><div><b>'+st+' hari beruntun</b><span>'+(streakOK(today)?'Streak hari ini menyala':'Selesaikan semua tugas hari ini agar streak tidak putus')+' · total '+totalDone()+' hari selesai</span></div><button class="gb2" data-act="day" data-n="-7" aria-label="Minggu sebelumnya">‹</button><button class="gb2" data-act="day" data-n="7" aria-label="Minggu berikutnya">›</button></div><div class="wkl">';
   let lastDone = -1; for (let i=0;i<7;i++){ const x = addDays(mon,i); if (x<=today && x>=FIRST && x<=LAST && streakOK(x)) lastDone = i; }
   html += '<span class="trk" style="width:calc('+((lastDone+1)/7*100)+'% - 4px)"></span>';
   for (let i=0;i<7;i++){ const x = addDays(mon,i), out = x<FIRST||x>LAST, ok = !out && x<=today && streakOK(x), fut = x>today, q = out||fut ? null : dayPct(x), pt = !ok && q!==null;
