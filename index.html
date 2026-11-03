@@ -322,7 +322,7 @@ body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none
 </head>
 <body>
 
-<main class="wrap" id="main"></main>
+<main class="wrap" id="main"><div class="lt"><div class="grow"><h1>Progres Harian Terpadu</h1></div></div><div class="group plain"><div class="row"><div class="rt"><div class="t">Halaman belum bisa berjalan di sini</div><div class="s">Tampilan ini membutuhkan JavaScript. Buka lewat link GitHub Pages di Safari atau Chrome, bukan dari pratinjau file di aplikasi Files atau GitHub.</div></div></div></div></main>
 <div class="toast" id="toast" hidden></div>
 <div class="tabbar"><nav id="tabs" aria-label="Bagian">
   <a href="#hari-ini"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16.5 9.5"/></svg>Hari Ini</a>
@@ -865,6 +865,8 @@ function vLainnya(){
     '<td>'+cell('settings','tLOTS',t.tLOTS,'pct')+'</td><td>'+cell('settings','tMOTS',t.tMOTS,'pct')+'</td><td>'+cell('settings','tHOTS',t.tHOTS,'pct')+'</td><td>'+cell('settings','tReview',t.tReview,'pct')+'</td><td>'+cell('settings','mpsMD',t.mpsMD,'num')+'</td><td>'+cell('settings','mpsVL',t.mpsVL,'num')+'</td></tr></tbody></table></div>')+'</div>';
   // data
   const db = Store.mode==='db';
+  const th = getTheme();
+  html += sh('Tampilan')+'<div class="group plain" style="padding:10px 12px"><div class="seg" role="group" aria-label="Tema" style="margin:0">'+[['auto','Otomatis'],['light','Terang'],['dark','Gelap']].map(([k,l]) => '<button data-act="theme" data-v="'+k+'" aria-pressed="'+(th===k)+'">'+l+'</button>').join('')+'</div></div><div class="foot">Otomatis mengikuti mode terang/gelap HP kamu.</div>';
   html += sh('Penyimpanan')+'<div class="group plain"><div class="row"><div class="rt"><div class="t">Tersimpan di</div></div><div class="rv">'+(db?'Akun Claude':'Browser ini')+'</div></div>'+
     '<button class="btnrow" data-act="export">Ekspor cadangan</button><button class="btnrow" data-act="copy">Salin data cadangan</button><label class="btnrow" for="imp">Impor dari file<input id="imp" type="file" accept=".json,application/json" hidden></label></div>'+
     '<div class="foot">'+(db?'Progres ikut terbuka di HP dan laptop selama kamu login.':'Progres hanya ada di browser ini. Pakai Ekspor lalu Impor untuk pindah perangkat.')+'</div>'+
@@ -923,6 +925,7 @@ document.addEventListener('click', e => {
   else if (act==='delerr'){ const id = b.dataset.id; if (ST.confirm==='del-'+id){ ST.confirm=null; setField(id,'deleted',true); toast('Soal dihapus'); } else { ST.confirm='del-'+id; render(); } }
   else if (act==='askshift'){ ST.confirm='shift-'+b.dataset.s; render(); }
   else if (act==='shift'){ shiftSessions(+b.dataset.s); }
+  else if (act==='theme'){ const t = b.dataset.v; try { localStorage.setItem('pht.theme', t); } catch(e){} applyTheme(t); render(); }
   else if (act==='askpbs'){ ST.confirm='pbs-'+b.dataset.d; render(); }
   else if (act==='askpv'){ ST.confirm='pv-'+b.dataset.d; render(); }
   else if (act==='pbs'){ const d = b.dataset.d, ss = sessionsOn(d); if (!ss.length) return;
@@ -1042,6 +1045,9 @@ const Store = {
   }
 };
 
+function getTheme(){ try { return localStorage.getItem('pht.theme') || 'auto'; } catch(e){ return 'auto'; } }
+function applyTheme(t){ if (t==='light' || t==='dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
+applyTheme(getTheme());
 ST.date = (() => { const t = todayStr(); return t < FIRST ? FIRST : t > LAST ? LAST : t; })();
 window.addEventListener('hashchange', route);
 ST.view = viewFromHash();
