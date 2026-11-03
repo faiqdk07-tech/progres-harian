@@ -663,7 +663,7 @@ function vHari(){
   }
   html += '<div class="th"><b>Vocab malam</b></div><div class="tasks">'+(vg || '<div class="card"><div class="row"><div class="rt"><div class="t muted">Tidak ada jadwal vocab</div></div></div></div>')+'</div>';
   // ubah jadwal
-  if (d >= today){
+  if (d >= addDays(today,-7)){
     const un = ST.ov.undo || {}, vs = (ST.ov.vskip||{})[d], rows = [];
     if (r.ss.length) rows.push(ST.confirm==='pbs-'+d
       ? '<button class="row" data-act="pbs" data-d="'+d+'">'+icon('move')+'<div class="rt"><div class="t" style="color:var(--red)">Yakin tunda sesi '+r.ss.join(', ')+'?</div><div class="s">Sesi ini dan semua sesi setelahnya mundur 1 hari, Minggu dilewati</div></div></button>'
