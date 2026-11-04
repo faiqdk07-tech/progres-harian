@@ -263,31 +263,25 @@ textarea.dump{width:100%;min-height:90px;font:12px var(--fm);border:0;background
 @media (max-width:420px){ .scard{padding:10px} .scard b{font-size:21px} .hgreet h1,.lt h1{font-size:30px} .jt span{font-size:10px} }
 /* ===== Liquid Glass: wallpaper lembut + panel kaca transparan ===== */
 :root{
-  --card:rgba(255,255,255,.6); --card2:rgba(118,118,128,.06); --subbg:rgba(255,255,255,.55); --cellbg:rgba(255,255,255,.35);
+  --card:#FFFFFF; --card2:rgba(118,118,128,.06); --subbg:rgba(255,255,255,.55); --cellbg:rgba(255,255,255,.35);
   --sep:rgba(60,60,67,.16); --line2:rgba(60,60,67,.32); --seg-on:rgba(255,255,255,.92); --on-ink:#FFFFFF;
-  --glass:rgba(255,255,255,.55); --hl:rgba(255,255,255,.85); --rim:rgba(255,255,255,.55); --drop:rgba(40,50,110,.12);
-  --wall:#ECEEF3; --w1:rgba(140,170,230,.28); --w2:rgba(190,180,225,.22); --w3:rgba(170,200,215,.2); --w4:rgba(160,170,220,.24); --w5:rgba(215,205,195,.18);
+  --glass:rgba(255,255,255,.55); --hl:rgba(255,255,255,.85); --rim:rgba(255,255,255,.55); --drop:rgba(30,40,80,.06);
+  --wall:#F2F3F7; --w1:rgba(140,170,230,.28); --w2:rgba(190,180,225,.22); --w3:rgba(170,200,215,.2); --w4:rgba(160,170,220,.24); --w5:rgba(215,205,195,.18);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --card:rgba(78,80,94,.5); --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
+  --card:#2A2B32; --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
   --sep:rgba(255,255,255,.12); --line2:rgba(255,255,255,.28); --seg-on:rgba(255,255,255,.2); --on-ink:#000000;
   --glass:rgba(40,40,48,.55); --hl:rgba(255,255,255,.22); --rim:rgba(255,255,255,.12); --drop:rgba(0,0,0,.45);
-  --wall:#1E2029; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}}
+  --wall:#1C1D22; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}}
 :root[data-theme="dark"]{
-  --card:rgba(78,80,94,.5); --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
+  --card:#2A2B32; --card2:rgba(255,255,255,.09); --subbg:rgba(255,255,255,.07); --cellbg:rgba(255,255,255,.05);
   --sep:rgba(255,255,255,.12); --line2:rgba(255,255,255,.28); --seg-on:rgba(255,255,255,.2); --on-ink:#000000;
   --glass:rgba(40,40,48,.55); --hl:rgba(255,255,255,.22); --rim:rgba(255,255,255,.12); --drop:rgba(0,0,0,.45);
-  --wall:#1E2029; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}
+  --wall:#1C1D22; --w1:rgba(90,115,190,.34); --w2:rgba(115,100,160,.24); --w3:rgba(80,115,130,.22); --w4:rgba(100,105,170,.26); --w5:rgba(130,115,100,.14)}
 body{background:var(--wall)}
-body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;background:
-  radial-gradient(38% 32% at 12% 8%,var(--w1),transparent 70%),
-  radial-gradient(34% 30% at 92% 14%,var(--w2),transparent 70%),
-  radial-gradient(40% 34% at 80% 62%,var(--w4),transparent 70%),
-  radial-gradient(36% 30% at 8% 70%,var(--w3),transparent 70%),
-  radial-gradient(30% 26% at 50% 100%,var(--w5),transparent 70%),var(--wall)}
+
 .group,.tasks,.scard,.pcard,.stk,.streak,.fcard,.jt,.gw,textarea.dump,.gb,.gb2{
-  background:var(--card);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);
-  box-shadow:inset 0 1px 0 var(--hl),inset 0 0 0 .5px var(--rim),0 10px 30px var(--drop)}
+  background:var(--card);box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop)}
 .group,.tasks{border-radius:24px}
 .scard,.pcard,.stk,.streak,.fcard{border-radius:26px}
 .jt,.gw{border-radius:18px}
@@ -297,7 +291,7 @@ body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none
 .sub{border-radius:16px;background:var(--subbg);box-shadow:inset 0 0 0 .5px var(--rim)}
 .txt{border-radius:14px}
 .btnrow.pri{border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 20px color-mix(in srgb,var(--blue) 35%,transparent)}
-.seg{border-radius:999px;padding:3px;background:var(--card);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 0 0 .5px var(--rim)}
+.seg{border-radius:999px;padding:3px;background:var(--card);box-shadow:inset 0 0 0 .5px var(--rim)}
 .seg button{border-radius:999px;padding:7px 6px}
 .seg button[aria-pressed="true"]{box-shadow:inset 0 1px 0 var(--hl),0 4px 12px var(--drop)}
 .seg.sj{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;padding:0;border-radius:0}
@@ -317,7 +311,7 @@ body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none
 .wd.ok .wc{background:var(--green)}
 .cal .cd.sel b,.wd.sel .wc{box-shadow:none;outline:2px solid var(--blue);outline-offset:2px}
 .cal .cd.sel:not(.today):not(.ok):not(.pt) b{color:var(--on-ink)}
-.spill{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:6px 13px 6px 10px;border-radius:999px;background:var(--card);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 1px 0 var(--hl),inset 0 0 0 .5px var(--rim),0 8px 22px var(--drop);color:var(--orange)}
+.spill{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:6px 13px 6px 10px;border-radius:999px;background:var(--card);box-shadow:inset 0 1px 0 var(--hl),inset 0 0 0 .5px var(--rim),0 8px 22px var(--drop);color:var(--orange)}
 .spill svg{width:18px;height:18px}
 .spill.tot{margin-left:0;color:var(--green)}
 .spill.off{color:var(--muted)}
@@ -347,6 +341,46 @@ body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none
 .hleg{display:inline-flex}
 .hleg i{font-style:normal;font-size:11px;padding:2px 5px;color:var(--hmi)}
 .hleg .h1{background:var(--hm1)} .hleg .h2{background:var(--hm2)} .hleg .h3{background:var(--hm3)} .hleg .h4{background:var(--hm4)} .hleg .h5{background:var(--hm5)}
+.vprog{margin-top:6px}
+.vpc{min-width:42px;text-align:right;font-weight:600;color:var(--ink);font-size:16px}
+.vsub{font-size:13px;min-width:38px;text-align:right}
+.vchart{margin-bottom:10px;padding:14px 14px 10px}
+.vch{display:flex;align-items:baseline;gap:8px;margin-bottom:0}
+.vch b{flex:1;font-size:16px;font-weight:600}
+.vch span{font-size:13px;color:var(--muted)}
+.vplot{position:relative;padding-left:38px;padding-top:34px}
+.vgrid{position:absolute;inset:34px 0 22px 0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.vgrid span{font-size:11px;color:var(--muted);line-height:0;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.vgrid span::after{content:"";flex:1;height:.5px;background:var(--sep)}
+.vgrid span:last-child::after{background:var(--line2)}
+.vbars{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:2px;height:172px;align-items:end}
+.vb{border:0;background:none;padding:0;height:100%;display:grid;grid-template-rows:1fr 22px;cursor:pointer;position:relative;min-width:0;color:var(--ink)}
+.vb i{align-self:end;justify-self:center;width:min(70%,22px);background:var(--blue);border-radius:4px 4px 0 0;min-height:0}
+.vb em{font-style:normal;font-size:11px;color:var(--muted);align-self:end;text-align:center;font-variant-numeric:tabular-nums}
+.vb:hover i,.vb:focus-visible i{filter:brightness(1.12)}
+.vb:hover em,.vb:focus-visible em{color:var(--ink);font-weight:600}
+.vtip{position:absolute;bottom:calc(100% - 14px);left:50%;transform:translateX(-50%);background:var(--glass);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 6px 18px var(--drop),inset 0 0 0 .5px var(--rim);color:var(--ink);font-size:12px;font-weight:600;padding:5px 9px;border-radius:10px;white-space:nowrap;display:none;z-index:2;text-align:center}
+.vtip small{display:block;font-weight:400;color:var(--muted)}
+.vb:first-child .vtip,.vb:nth-child(2) .vtip{left:0;transform:none}
+.vb:last-child .vtip,.vb:nth-last-child(2) .vtip{left:auto;right:0;transform:none}
+.vb:hover .vtip,.vb:focus-visible .vtip{display:block}
+.vph{display:flex;align-items:center;gap:14px;padding:16px 16px 10px}
+.vring{--p:0;width:66px;height:66px;border-radius:50%;flex:none;display:grid;place-items:center;position:relative;background:conic-gradient(var(--blue) calc(var(--p)*1%),var(--card2) 0)}
+.vring::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--card)}
+.vring span{position:relative;font:700 15px var(--fd);font-variant-numeric:tabular-nums}
+.vbig{font:700 30px/1.1 var(--fd);letter-spacing:-.02em}
+.vbig small{font-size:17px;color:var(--muted);font-weight:600}
+.vcrow{min-height:52px}
+.vcrow.on .t{font-weight:600;color:var(--blue)}
+.vcrow.open .chev{transform:rotate(-45deg)}
+.vcrow .chev{transform:rotate(135deg)}
+.vct{display:flex;align-items:baseline;gap:8px}
+.vct .t{flex:1}
+.vct .rv{font-size:14px}
+.pbar{height:6px;border-radius:999px;background:var(--card2);overflow:hidden;margin-top:7px}
+.pbar i{display:block;height:100%;border-radius:inherit;background:var(--blue);min-width:0}
+.pbar.sm{height:4px;margin-top:6px}
+.vcrow.on .pbar i{background:var(--blue)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -870,17 +904,36 @@ function vVocabList(){
     const words = l.w.map((w,wi) => [w,wi]).filter(([w]) => !q || w[0].toLowerCase().includes(q)); if (!words.length) return;
     hit += words.length;
     const m = l.w.filter((w,wi) => wordOn(c.c, li+'.'+wi)).length, id = 'vl'+c.c+li, op = !!q || ST.open.has(id);
-    html += '<button class="row'+(op?' open':'')+'" data-act="exp" data-id="'+id+'" aria-expanded="'+op+'">'+chkShow(m===l.w.length, m>0)+'<div class="rt"><div class="t">'+esc(l.n)+'</div></div><div class="rv">'+m+'/'+l.w.length+'</div><span class="chev"></span></button>'+
+    html += '<button class="row'+(op?' open':'')+'" data-act="exp" data-id="'+id+'" aria-expanded="'+op+'">'+chkShow(m===l.w.length, m>0)+'<div class="rt"><div class="t">'+esc(l.n.replace(/^List \d+: /,''))+'</div><div class="pbar sm"><i style="width:'+(m/l.w.length*100)+'%"></i></div></div><div class="rv"><span class="vsub">'+m+'/'+l.w.length+'</span><b class="vpc">'+pctTxt(m,l.w.length)+'</b></div><span class="chev"></span></button>'+
       (op ? '<div class="xp"><div class="chips">'+words.map(([w,wi]) => '<button class="chip" data-act="word" data-c="'+c.c+'" data-r="'+li+'.'+wi+'" aria-pressed="'+wordOn(c.c,li+'.'+wi)+'" title="'+esc(w[1])+'">'+esc(w[0])+'</button>').join('')+'</div></div>' : '');
   });
   return hit ? html : '<div class="row"><div class="rt"><div class="s" style="font-size:15px">Kata tidak ditemukan</div></div></div>';
 }
+const pctTxt = (n,t) => !t ? '0%' : (n>0 && n/t<.01 ? '<1' : Math.round(n/t*100))+'%';
+function vProgress(){
+  const cs = DATA.cats.map(x => [x, ...catProgress(x.c)]), N = cs.reduce((z,x)=>z+x[1],0), T = cs.reduce((z,x)=>z+x[2],0);
+  let html = '<div class="group plain vprog"><div class="vph"><div class="rt"><div class="vbig num">'+N+'<small> / '+T+' kata</small></div><div class="s">dikuasai di '+cs.length+' kategori</div></div></div>';
+  const op = ST.open.has('vcats'), crow = ([x,n,t], sel) => '<button class="row vcrow'+(sel?' on'+(op?' open':''):'')+'" '+(sel?'data-act="exp" data-id="vcats" aria-expanded="'+op+'"':'data-act="vcat" data-v="'+x.c+'"')+'><div class="rt"><div class="vct"><span class="t">'+esc(x.name.replace(' Roadmap',''))+'</span><span class="rv num">'+n+'/'+t+'</span><b class="vpc num">'+pctTxt(n,t)+'</b></div><div class="pbar"><i style="width:'+(t?n/t*100:0)+'%"></i></div></div>'+(sel?'<span class="chev"></span>':'')+'</button>';
+  html += crow(cs.find(x => x[0].c===ST.vcat), true);
+  if (op) html += cs.filter(x => x[0].c!==ST.vcat).map(x => crow(x, false)).join('');
+  html += '</div>';
+  return html;
+}
+function vChart(c){
+  const L = c.lists.map((l,li) => { const m = l.w.filter((w,wi) => wordOn(c.c, li+'.'+wi)).length; return {i:li+1, n:l.n.replace(/^List \d+: /,''), m, t:l.w.length, p:m/l.w.length}; });
+  const lab = L.length > 12 ? (x => x.i%2 ? x.i : '') : (x => x.i);
+  return '<div class="group plain vchart"><div class="vch"><b>Penguasaan per list</b><span>% kata dikuasai</span></div>'+
+    '<div class="vplot" style="--n:'+L.length+'"><div class="vgrid"><span>100%</span><span>50%</span><span>0%</span></div><div class="vbars">'+
+    L.map(x => '<button class="vb" data-act="exp" data-id="vl'+c.c+(x.i-1)+'" aria-label="List '+x.i+', '+esc(x.n)+': '+x.m+' dari '+x.t+' kata, '+Math.round(x.p*100)+'%"><span class="vtip">List '+x.i+' · '+Math.round(x.p*100)+'%<small>'+x.m+'/'+x.t+' kata</small></span><i style="height:'+(x.p*100)+'%"></i><em>'+lab(x)+'</em></button>').join('')+
+    '</div></div></div>';
+}
 function vVocab(){
   const c = CAT[ST.vcat], [n,t] = catProgress(c.c);
-  let html = head(n+' dari '+t+' kata dikuasai', 'Vocab');
-  html += '<div class="seg" role="group" aria-label="Kategori">'+DATA.cats.map(x => '<button data-act="vcat" data-v="'+x.c+'" aria-pressed="'+(x.c===ST.vcat)+'">'+esc(x.name.replace(' Roadmap',''))+'</button>').join('')+'</div>';
+  let html = head('Kosakata Bahasa Inggris', 'Vocab');
+  html += vProgress();
   html += '<div style="height:10px"></div><div class="group plain"><div class="fr"><label for="vq" style="flex:none">Cari</label><input id="vq" type="search" autocomplete="off" placeholder="kata…" value="'+esc(ST.vq)+'" style="max-width:none;flex:1"></div></div>';
   html += sh('Daftar kata')+'<div class="group" id="vlist">'+vVocabList()+'</div>';
+  html += '<div style="height:20px"></div>'+vChart(c);
   return html;
 }
 
@@ -978,7 +1031,7 @@ document.addEventListener('click', e => {
     const ov = Object.assign({}, ST.ov[e.id]||{}, {status:b.dataset.v}); ov[b.dataset.v==='Ulang benar'?'tglUlang':'tglBedah'] = todayStr();
     ST.ov[e.id] = ov; Store.write(e.id); if (ST.errFilter!=='semua') ST.errFilter = b.dataset.v; render(); toast('Status: '+b.dataset.v); }
   else if (act==='adderr'){ ST.addErr = !ST.addErr; render(); }
-  else if (act==='vcat'){ ST.vcat = b.dataset.v; ST.vq=''; render(); }
+  else if (act==='vcat'){ ST.vcat = b.dataset.v; ST.vq=''; ST.open.delete('vcats'); render(); }
   else if (act==='delerr'){ const id = b.dataset.id; if (ST.confirm==='del-'+id){ ST.confirm=null; setField(id,'deleted',true); toast('Soal dihapus'); } else { ST.confirm='del-'+id; render(); } }
   else if (act==='askshift'){ ST.confirm='shift-'+b.dataset.s; render(); }
   else if (act==='shift'){ shiftSessions(+b.dataset.s); }
