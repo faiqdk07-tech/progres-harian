@@ -414,6 +414,20 @@ body{background:var(--wall)}
 .home .th b{font-size:18px}
 .thc{font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 .thc.ok{color:var(--green-ink)}
+.weak .btnrow{font-weight:600}
+.wl-row{position:relative;padding:12px 16px}
+.wl-row::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.wl-h{display:flex;align-items:center;gap:8px}
+.wl-h b{font-size:16px;font-weight:600}
+.wl-h span{font-size:13px;color:var(--muted);flex:1;font-variant-numeric:tabular-nums}
+.wl-t{flex:1;min-width:0;min-height:30px;display:flex;align-items:center;gap:8px;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:var(--ink)}
+.wl-t b{font-size:16px;font-weight:600;overflow-wrap:anywhere}
+.wl-t span:not(.chev){font-size:13px;color:var(--muted);white-space:nowrap}
+.wl-t .chev{flex:none;margin-left:auto;margin-right:10px;transform:rotate(135deg)}
+.wl-t.open .chev{transform:rotate(-45deg)}
+.cpb{border:0;background:var(--blue-soft);color:var(--blue);font-size:14px;font-weight:600;padding:5px 12px;border-radius:999px;cursor:pointer}
+.cpb:active{opacity:.7}
+.wl-w{margin:6px 0 0;font-size:15px;line-height:1.45;color:var(--ink2);-webkit-user-select:text;user-select:text;overflow-wrap:anywhere}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -952,13 +966,17 @@ function vProgress(){
   html += '</div>';
   return html;
 }
-function vChart(c){
-  const L = c.lists.map((l,li) => { const m = l.w.filter((w,wi) => wordOn(c.c, li+'.'+wi)).length; return {i:li+1, n:l.n.replace(/^List \d+: /,''), m, t:l.w.length, p:m/l.w.length}; });
-  const lab = L.length > 12 ? (x => x.i%2 ? x.i : '') : (x => x.i);
-  return '<div class="group plain vchart"><div class="vch"><b>Penguasaan per list</b><span>% kata dikuasai</span></div>'+
-    '<div class="vplot" style="--n:'+L.length+'"><div class="vgrid"><span>100%</span><span>50%</span><span>0%</span></div><div class="vbars">'+
-    L.map(x => '<button class="vb" data-act="exp" data-id="vl'+c.c+(x.i-1)+'" aria-label="List '+x.i+', '+esc(x.n)+': '+x.m+' dari '+x.t+' kata, '+Math.round(x.p*100)+'%"><span class="vtip">List '+x.i+' · '+Math.round(x.p*100)+'%<small>'+x.m+'/'+x.t+' kata</small></span><i style="height:'+(x.p*100)+'%"></i><em>'+lab(x)+'</em></button>').join('')+
-    '</div></div></div>';
+function weakWords(c){
+  return c.lists.map((l,li) => ({li, n:l.n.replace(/^List \d+: /,''), w:l.w.filter((w,wi) => !wordOn(c.c, li+'.'+wi)).map(w => w[0])})).filter(x => x.w.length);
+}
+function vWeak(c){
+  const L = weakWords(c), tot = L.reduce((z,x)=>z+x.w.length,0);
+  if (!L.length) return sh('Belum dikuasai')+'<div class="group plain"><div class="row"><div class="rt"><div class="t">Semua kata di kategori ini sudah dikuasai</div></div></div></div>';
+  return sh('Belum dikuasai', tot+' kata')+'<div class="group plain weak">'+
+    '<button class="btnrow" data-act="copyw" data-l="all">Salin semua ('+tot+' kata)</button>'+
+    L.map(x => { const fresh = x.w.length === c.lists[x.li].w.length, id = 'ww'+c.c+x.li, op = !fresh || ST.open.has(id);
+      return '<div class="wl-row"><div class="wl-h">'+(fresh ? '<button class="wl-t'+(op?' open':'')+'" data-act="exp" data-id="'+id+'" aria-expanded="'+op+'"><b>'+esc(x.n)+'</b><span>'+x.w.length+'</span><span class="chev"></span></button>' : '<b>'+esc(x.n)+'</b><span>'+x.w.length+'</span>')+
+        '<button class="cpb" data-act="copyw" data-l="'+x.li+'">Salin</button></div>'+(op ? '<p class="wl-w" id="ww-'+c.c+'-'+x.li+'">'+x.w.map(esc).join(', ')+'</p>' : '')+'</div>'; }).join('')+'</div>';
 }
 function vVocab(){
   const c = CAT[ST.vcat], [n,t] = catProgress(c.c);
@@ -966,7 +984,7 @@ function vVocab(){
   html += vProgress();
   html += '<div style="height:10px"></div><div class="group plain"><div class="fr"><label for="vq" style="flex:none">Cari</label><input id="vq" type="search" autocomplete="off" placeholder="kata…" value="'+esc(ST.vq)+'" style="max-width:none;flex:1"></div></div>';
   html += sh('Daftar kata')+'<div class="group" id="vlist">'+vVocabList()+'</div>';
-  html += '<div style="height:20px"></div>'+vChart(c);
+  html += '<div style="height:8px"></div>'+vWeak(c);
   return html;
 }
 
@@ -1068,6 +1086,10 @@ document.addEventListener('click', e => {
   else if (act==='delerr'){ const id = b.dataset.id; if (ST.confirm==='del-'+id){ ST.confirm=null; setField(id,'deleted',true); toast('Soal dihapus'); } else { ST.confirm='del-'+id; render(); } }
   else if (act==='askshift'){ ST.confirm='shift-'+b.dataset.s; render(); }
   else if (act==='shift'){ shiftSessions(+b.dataset.s); }
+  else if (act==='copyw'){ const c = CAT[ST.vcat], L = weakWords(c), sel = b.dataset.l==='all' ? L : L.filter(x => String(x.li)===b.dataset.l);
+    const tx = sel.flatMap(x => x.w).join(', '), n = sel.reduce((z,x)=>z+x.w.length,0);
+    const manual = () => { const el = b.dataset.l==='all' ? null : document.getElementById('ww-'+c.c+'-'+b.dataset.l); if (el){ const r = document.createRange(); r.selectNodeContents(el); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); } toast(el ? 'Teks sudah dipilih, salin manual' : 'Gagal menyalin, salin per list'); };
+    try { navigator.clipboard.writeText(tx).then(() => toast(n+' kata disalin'), manual); } catch(e){ manual(); } }
   else if (act==='calmode'){ ST.calMode = b.dataset.v; render(); }
   else if (act==='theme'){ const t = b.dataset.v; try { localStorage.setItem('pht.theme', t); } catch(e){} applyTheme(t); render(); }
   else if (act==='askpbs'){ ST.confirm='pbs-'+b.dataset.d; render(); }
