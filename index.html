@@ -37,7 +37,7 @@ button,input,select,textarea{font:inherit;color:inherit;letter-spacing:inherit}
 :focus-visible{outline:2px solid var(--blue);outline-offset:1px}
 .num{font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
-.mascot{display:none}
+
 
 /* judul besar */
 .lt{display:flex;align-items:flex-end;gap:12px;padding:18px 4px 12px}
@@ -428,6 +428,47 @@ body{background:var(--wall)}
 .cpb{border:0;background:var(--blue-soft);color:var(--blue);font-size:14px;font-weight:600;padding:5px 12px;border-radius:999px;cursor:pointer}
 .cpb:active{opacity:.7}
 .wl-w{margin:6px 0 0;font-size:15px;line-height:1.45;color:var(--ink2);-webkit-user-select:text;user-select:text;overflow-wrap:anywhere}
+.hhd{display:flex;align-items:flex-start;gap:6px;padding:10px 4px 12px}
+.hhd .hgreet{flex:1;min-width:0;padding:0}
+.hhd .spill{margin-top:4px}
+.lnk{border:0;background:none;padding:0;color:var(--blue);font:inherit;font-weight:600;cursor:pointer;text-transform:none;letter-spacing:0}
+.wkrow{display:flex;align-items:center;gap:2px;border-top:.5px solid var(--sep);padding-top:10px;margin:0 -8px}
+.wkrow .wkl{flex:1;margin-top:0}
+.wnav{border:0;background:none;color:var(--muted);font-size:20px;width:22px;padding:0;cursor:pointer;align-self:flex-end;height:30px}
+.weak{padding:2px 0}
+.wk-r{display:flex;align-items:flex-start;gap:6px;padding:7px 8px 7px 16px;position:relative}
+.wk-r+.wk-r::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.wk-t{flex:1;min-width:0;display:flex;gap:10px;align-items:baseline;border:0;background:none;padding:2px 0;text-align:left;color:var(--ink);cursor:default}
+.wk-t[data-act]{cursor:pointer}
+.wk-t b{flex:none;width:34px;font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.wk-w{font-size:14px;line-height:1.4;color:var(--ink2);overflow-wrap:anywhere;-webkit-user-select:text;user-select:text}
+.wk-w.muted{color:var(--muted)}
+.cpi{flex:none;width:28px;height:24px;border:0;background:none;color:var(--blue);display:grid;place-items:center;cursor:pointer;border-radius:6px}
+.cpi:active{background:var(--fill)}
+.cpi svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+:root{--blob1:rgba(255,154,92,.22);--blob2:rgba(90,200,250,.18)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--blob1:rgba(255,154,92,.16);--blob2:rgba(90,200,250,.12)}}
+:root[data-theme="dark"]{--blob1:rgba(255,154,92,.16);--blob2:rgba(90,200,250,.12)}
+.lt{position:relative}
+.lumi{flex:none;border:0;background:none;padding:0;cursor:pointer;position:relative;margin:-14px -6px -18px 0;align-self:flex-end;-webkit-tap-highlight-color:transparent}
+.lumi::before{content:"";position:absolute;inset:6% 0 4% 4%;border-radius:50%;background:radial-gradient(circle at 40% 40%,var(--blob1),transparent 62%),radial-gradient(circle at 72% 70%,var(--blob2),transparent 55%);z-index:-1}
+.lumi .mascot{display:block;animation:bob 3.2s ease-in-out infinite;transform-origin:50% 90%}
+.lumi .mascot.hop{animation:hop .5s ease-out,bob 3.2s ease-in-out .5s infinite}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes hop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.05,.96)}70%{transform:translateY(0) scale(.97,1.03)}100%{transform:none}}
+.hhd{align-items:flex-end}
+.hhd .lumi{margin:-10px -8px -12px 0}
+.pills{display:flex;gap:6px;margin-top:8px}
+.pills .spill{margin:0}
+.lt .bubble{font-weight:400}
+.bubble{--ln:2;width:min(360px,100%);max-width:none!important;margin-left:auto!important;margin-right:4px;box-sizing:border-box;height:calc(var(--ln)*1.35em + 18px);display:flex;align-items:center}
+.bubble>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--ln);overflow:hidden}
+@media (max-width:520px){.bubble{--ln:3;font-size:13.5px!important}}
+.bubble{position:relative;margin-top:10px;margin-left:0;animation:pop .25s ease-out;background:var(--card);color:var(--ink);font-size:14px;line-height:1.35;padding:9px 12px;border-radius:16px;box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop);max-width:260px}
+.bubble::after{content:"";position:absolute;right:-6px;top:50%;margin-top:-6px;width:12px;height:12px;background:var(--card);transform:rotate(45deg);border-radius:2px;box-shadow:1px -1px 0 0 var(--rim)}
+@media (max-width:420px){.lt .lumi svg{width:84px;height:84px}.hhd .lumi svg{width:100px;height:100px}}
+@media (prefers-reduced-motion:reduce){.lumi .mascot,.lumi .mascot.hop,.bubble{animation:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -606,7 +647,7 @@ const txt = (k,f,ph,val) => '<textarea class="txt" rows="1" id="t-'+k+'-'+f+'" d
 const code = c => '<span class="code c-'+(c||'').slice(0,2)+'">'+esc(c)+'</span>';
 const accTd = (a, t) => '<td class="v '+(isNum(a)?(a>=t?'good':'bad'):'')+'">'+pct(a)+'</td>';
 function todayMood(){ const T = dayTasks(todayStr()), n = T.filter(x=>x.done).length; return T.length && n===T.length ? 'cheer' : n ? 'happy' : 'ready'; }
-const head = (eb, title, extra='') => '<div class="lt"><div class="grow">'+(eb?'<div class="eb">'+eb+'</div>':'')+'<h1>'+title+'</h1>'+syncHTML()+'</div>'+extra+mascot(todayMood(), 70)+'</div>';
+const head = (eb, title, extra='') => '<div class="lt"><div class="grow">'+(eb?'<div class="eb">'+eb+'</div>':'')+'<h1>'+title+'</h1>'+syncHTML()+bubble()+'</div>'+extra+lumi(96)+'</div>';
 const sh = (l, r='') => '<div class="sh"><span>'+l+'</span>'+(r?'<span>'+r+'</span>':'')+'</div>';
 
 /* ---------- Hari Ini ---------- */
@@ -620,25 +661,57 @@ function streak(){ const t = todayStr(); let n = 0, x = streakOK(t) ? t : addDay
 function totalDone(){ const t = todayStr(); let n = 0; for (let x = FIRST; x <= t; x = addDays(x,1)) if (streakOK(x)) n++; return n; }
 function mondayOf(d){ const x = pd(d), n = (x.getDay()+6)%7; return addDays(d, -n); }
 /* ---------- maskot orisinal: "Lumi", gumpalan oranye dengan tunas daun ---------- */
-function mascot(mood, size){ return '';
-  // mood: 'cheer' (semua beres), 'happy' (sebagian), 'ready' (belum mulai)
-  const cheer = mood==='cheer', ready = mood==='ready';
+/* Lumi, maskot belajar. pose mengikuti halaman, ekspresi mengikuti progres hari ini */
+function mascot(mood, size, pose){
+  pose = pose || 'wave';
+  const cheer = mood==='cheer', ready = mood==='ready', ink = '#3B2A4A', skin = '#FF9A5C';
   const eyes = cheer
-    ? '<path d="M38 56q5-6 10 0M62 56q5-6 10 0" stroke="#3B2A4A" stroke-width="3.2" fill="none" stroke-linecap="round"/>'
-    : '<ellipse cx="43" cy="56" rx="4.2" ry="5.2" fill="#3B2A4A"/><ellipse cx="67" cy="56" rx="4.2" ry="5.2" fill="#3B2A4A"/><circle cx="44.6" cy="54" r="1.5" fill="#fff"/><circle cx="68.6" cy="54" r="1.5" fill="#fff"/>';
-  const mouth = cheer ? '<path d="M48 66q7 9 14 0z" fill="#B23A48"/>' : ready ? '<path d="M50 67q5 3 10 0" stroke="#3B2A4A" stroke-width="2.6" fill="none" stroke-linecap="round"/>' : '<path d="M48 65q7 7 14 0" stroke="#3B2A4A" stroke-width="2.8" fill="none" stroke-linecap="round"/>';
-  const arms = cheer
-    ? '<ellipse cx="17" cy="48" rx="6" ry="9" transform="rotate(-30 17 48)" fill="#FF9A5C"/><ellipse cx="93" cy="48" rx="6" ry="9" transform="rotate(30 93 48)" fill="#FF9A5C"/>'
-    : '<ellipse cx="18" cy="72" rx="6" ry="8.5" transform="rotate(20 18 72)" fill="#FF9A5C"/><ellipse cx="92" cy="72" rx="6" ry="8.5" transform="rotate(-20 92 72)" fill="#FF9A5C"/>';
-  const spark = cheer ? '<path d="M10 22l2 5 5 2-5 2-2 5-2-5-5-2 5-2z M100 18l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z" fill="#FFC53D"/>' : '';
-  return '<svg class="mascot" width="'+size+'" height="'+size+'" viewBox="0 0 110 110" role="img" aria-label="Lumi, teman belajar">'+
+    ? '<path d="M38 56q5-6 10 0M62 56q5-6 10 0" stroke="'+ink+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'
+    : '<ellipse cx="43" cy="56" rx="4.2" ry="5.2" fill="'+ink+'"/><ellipse cx="67" cy="56" rx="4.2" ry="5.2" fill="'+ink+'"/><circle cx="44.6" cy="54" r="1.5" fill="#fff"/><circle cx="68.6" cy="54" r="1.5" fill="#fff"/>';
+  const mouth = cheer || pose==='star' ? '<path d="M48 65q7 9 14 0z" fill="#B23A48"/>' : ready ? '<path d="M49 66q6 5 12 0" stroke="'+ink+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>' : '<path d="M48 65q7 7 14 0" stroke="'+ink+'" stroke-width="2.8" fill="none" stroke-linecap="round"/>';
+  const arm = (cx,cy,rot) => '<ellipse cx="'+cx+'" cy="'+cy+'" rx="6" ry="9" transform="rotate('+rot+' '+cx+' '+cy+')" fill="'+skin+'"/>';
+  const spark = (x,y,r,c) => '<path transform="translate('+x+' '+y+') scale('+r+')" d="M0-5l1.4 3.6L5 0 1.4 1.4 0 5-1.4 1.4-5 0-1.4-1.4z" fill="'+(c||'#FFC53D')+'"/>';
+  let back = '', front = '';
+  if (pose==='wave'){ back = arm(16,44,-35)+spark(8,22,1.3)+spark(100,30,1,'#5AC8FA'); front = arm(90,74,-20)+'<path d="M6 38q-4-6 0-12M2 42q-6-9 0-18" stroke="'+skin+'" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/>'; }
+  else if (pose==='calendar'){ front = '<g transform="rotate(-8 55 84)"><rect x="35" y="70" width="40" height="30" rx="5" fill="#fff" stroke="#E4E4EA"/><rect x="35" y="70" width="40" height="9" rx="4" fill="#FF3B30"/><path d="M47 89l5 5 10-10" stroke="#34C759" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>'+arm(32,84,40)+arm(78,84,-40)+spark(98,24,1.1)+spark(12,30,.9,'#5AC8FA'); }
+  else if (pose==='search'){ back = arm(18,72,20)+spark(14,24,1); front = arm(86,52,25)+'<circle cx="92" cy="34" r="11" fill="#E8F3FF" stroke="#007AFF" stroke-width="4"/><path d="M84 43l-7 9" stroke="#007AFF" stroke-width="5" stroke-linecap="round"/>'; }
+  else if (pose==='book'){ front = '<path d="M30 78q12-6 25 0q13-6 25 0v20q-12-6-25 0q-13-6-25 0z" fill="#007AFF"/><path d="M55 78v20" stroke="#fff" stroke-width="2"/><text x="42" y="93" font-family="-apple-system,Arial,sans-serif" font-weight="700" font-size="10" fill="#fff">A</text><text x="61" y="93" font-family="-apple-system,Arial,sans-serif" font-weight="700" font-size="10" fill="#fff">a</text>'+arm(28,86,40)+arm(82,86,-40)+spark(100,26,1.1)+spark(10,34,.9,'#AF52DE'); }
+  else if (pose==='star'){ back = arm(18,40,-28)+arm(92,40,28); front = '<path d="M55 0l4.4 9 9.9 1.4-7.2 7 1.7 9.8L55 22.6l-8.8 4.6 1.7-9.8-7.2-7 9.9-1.4z" fill="#FFC53D" stroke="#F5A623" stroke-width="1.5" stroke-linejoin="round" transform="translate(0 -2) scale(1)"/>'+spark(10,24,.9)+spark(100,22,.9,'#5AC8FA'); }
+  else { back = arm(18,72,20); front = arm(92,72,-20); }
+  const leaf = pose==='star' ? '' : '<path d="M55 27c0-8 1-13 3-17" stroke="#2E9E6A" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 12c7-6 16-5 19-1-5 6-13 7-19 1z" fill="#4CC38A"/><path d="M56 15c-6-5-14-4-17 0 5 5 12 5 17 0z" fill="#6ED6A2"/>';
+  return '<svg class="mascot" width="'+size+'" height="'+size+'" viewBox="-4 -6 118 118" role="img" aria-label="Lumi, teman belajar">'+
     '<defs><radialGradient id="lumiG" cx="40%" cy="32%" r="75%"><stop offset="0" stop-color="#FFC9A3"/><stop offset=".6" stop-color="#FF9F66"/><stop offset="1" stop-color="#F57F45"/></radialGradient></defs>'+
-    '<ellipse cx="55" cy="101" rx="30" ry="5" fill="#000" opacity=".08"/>'+spark+arms+
-    '<path d="M55 26c24 0 38 16 38 38 0 20-15 33-38 33S17 84 17 64c0-22 14-38 38-38z" fill="url(#lumiG)"/>'+
-    '<path d="M55 27c0-8 1-13 3-17" stroke="#2E9E6A" stroke-width="3" fill="none" stroke-linecap="round"/>'+
-    '<path d="M58 12c7-6 16-5 19-1-5 6-13 7-19 1z" fill="#4CC38A"/><path d="M56 15c-6-5-14-4-17 0 5 5 12 5 17 0z" fill="#6ED6A2"/>'+
-    eyes+'<ellipse cx="34" cy="66" rx="5.5" ry="3.4" fill="#FF6F8A" opacity=".45"/><ellipse cx="76" cy="66" rx="5.5" ry="3.4" fill="#FF6F8A" opacity=".45"/>'+mouth+'</svg>';
+    '<ellipse cx="55" cy="104" rx="30" ry="4.5" fill="#000" opacity=".08"/>'+back+
+    '<path d="M55 26c24 0 38 16 38 38 0 20-15 33-38 33S17 84 17 64c0-22 14-38 38-38z" fill="url(#lumiG)"/>'+leaf+
+    eyes+'<ellipse cx="34" cy="66" rx="5.5" ry="3.4" fill="#FF6F8A" opacity=".45"/><ellipse cx="76" cy="66" rx="5.5" ry="3.4" fill="#FF6F8A" opacity=".45"/>'+mouth+front+'</svg>';
 }
+const POSE = {'hari-ini':'wave', kalender:'calendar', evaluasi:'search', vocab:'book', lainnya:'star'};
+const lumi = (size) => '<button class="lumi" data-act="lumi" aria-label="Lumi, ketuk untuk semangat">'+mascot(todayMood(), size, POSE[ST.view])+'</button>';
+const TIPS = {
+  'hari-ini': ['Satu centang kecil tetap kemajuan.','Konsisten mengalahkan semangat sesaat.','Fokus 25 menit dulu, sisanya nyusul.','Istirahat boleh, berhenti jangan.','Mulai dari habit, biar mesinnya panas.','Hari ini lebih baik dari kemarin, itu cukup.'],
+  kalender: ['Kotak hijau berturut-turut = streak aman.','Jadwal tertinggal? Geser, jangan ditumpuk.','Sedikit tiap hari lebih kuat dari ngebut sehari.','Isi durasi belajar biar kelihatan polanya.','Minggu libur Basic Skills, habit tetap jalan.'],
+  evaluasi: ['Soal salah itu harta karun. Bedah polanya.','Salah baca soal? Garis bawahi kata kuncinya.','Kehabisan waktu? Latih timed drill lagi.','Salah konsep? Balik ke materi, jangan langsung soal.','Di UTBK, kerjakan dulu soal yang kamu yakin.','Penalaran Umum menguji pola pikir, bukan hafalan.'],
+  vocab: ['Baca pertanyaannya dulu, baru cari di teks.','Tebak arti dari konteks sebelum buka kamus.','Satu paket vocab sehari sudah cukup.','Ulang kata lemah di Vocab Lab malam ini.','Kata akademik sering muncul di teks UTBK.'],
+  lainnya: ['Akurasi review di bawah target? Ulang unitnya.','Persen, rasio, pecahan wajib lancar untuk PK.','Tryout juga latihan mental. Duduk fokus tanpa HP.','Tidur cukup bikin materi lebih nempel.','Simpan cadangan data sesekali, biar aman.']
+};
+const daysToUTBK = () => Math.max(0, Math.round((pd('2027-04-01') - pd(todayStr())) / 864e5));
+function lumiSays(view, d){
+  const today = todayStr(), cd = daysToUTBK();
+  if (view==='kalender') return 'Kurang dari '+cd+' hari menuju UTBK April 2027. Gas!';
+  if (view==='evaluasi'){ const op = errors().filter(errOpen).length;
+    return op ? op+' soal salah belum dibedah. Jebakannya bisa muncul lagi!' : 'Semua soal salah sudah dibedah. Mentor bangga!'; }
+  if (view==='vocab'){ const [n,t] = catProgress(ST.vcat), left = t-n;
+    return left ? left+' kata lagi di '+CAT[ST.vcat].name.replace(' Roadmap','')+'. Sikat!' : 'Kategori ini tuntas! Lanjut kategori berikutnya.'; }
+  if (view==='lainnya') return 'Cek akurasi tiap unit. Yang merah, prioritaskan.';
+  if (d && d!==today) return d < today ? 'Hari yang sudah lewat. Ambil pelajarannya.' : 'Intip jadwal besok biar nggak kaget.';
+  const T = dayTasks(today), done = T.filter(t=>t.done).length, left = T.length - done, st = streak(), hr = new Date().getHours();
+  if (!T.length) return 'Hari ini santai. Recharge, besok gas lagi!';
+  if (!left) return 'Semua beres! Streak '+st+' hari, pertahankan.';
+  if (hr >= 20) return 'Sudah malam. '+left+' tugas lagi biar streak aman.';
+  if (!done) return hr < 12 ? 'Pagi, Faiq! '+T.length+' tugas menunggu. Mulai, yuk.' : 'Belum ada yang dicentang. Satu dulu, yuk.';
+  return 'Tinggal '+left+' tugas lagi. '+(st ? 'Jaga streak '+st+' harimu!' : 'Ayo mulai streak baru!');
+}
+const bubble = d => '<div class="bubble" aria-live="polite"><span>'+esc(ST.tipView===ST.view && ST.tip!=null ? TIPS[ST.view][ST.tip] : lumiSays(ST.view, d))+'</span></div>';
 
 /* ikon tugas (kotak berwarna di kiri tiap kartu) */
 const IC = {
@@ -668,7 +741,6 @@ function vHari(){
   const d = ST.date, T = dayTasks(d), done = T.filter(t=>t.done).length, r = dayRows(d), v = vday(d), h = eff('h'+d), t = settings();
   const today = todayStr(), dd = pd(d), od = d===today ? overdue(d) : [];
   const mood = T.length && done===T.length ? 'cheer' : done ? 'happy' : 'ready';
-  const bubble = mood==='cheer' ? 'Semua beres' : mood==='happy' ? 'Sedang berjalan' : 'Belum mulai';
   const greet = d===today ? 'Hai, Faiq' : d===addDays(today,-1) ? 'Kemarin' : d===addDays(today,1) ? 'Besok' : HARI[dd.getDay()];
   // ringkasan per kelompok
   const hb = HABITS.filter(([f])=>h[f]).length;
@@ -676,24 +748,19 @@ function vHari(){
   const nextT = T.find(x => !x.done && !HABITS.some(([,l]) => l===x.l)) || T.find(x => !x.done);
   let html = '<div class="home">';
   const on = streakOK(today);
-  html += '<div class="hbar"><button class="gb" data-act="day" data-n="-1" aria-label="Hari sebelumnya">‹</button><button class="gb" data-act="day" data-n="1" aria-label="Hari berikutnya">›</button>'+
-    (d!==today?'<button class="gb wide" data-act="today">Hari ini</button>':'')+
+  html += '<div class="hhd"><div class="hgreet"><h1>'+greet+'</h1><p>'+HARI[dd.getDay()]+', '+dd.getDate()+' '+BULAN[dd.getMonth()]+(d!==today?' · <button class="lnk" data-act="today">Hari ini</button>':'')+'</p>'+syncHTML()+'<div class="pills">'+
     '<span class="spill'+(on?'':' off')+'" title="Streak"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.2 5.4 4.2 10a4.2 4.2 0 01-8.4 0c0-1.7.8-3 1.8-4 .1 1.6.9 2.6 1.9 3 0-3.4-.7-6.4.5-9z" fill="currentColor"/></svg><b>'+streak()+'</b></span>'+
-    '<span class="spill tot" title="Total hari selesai"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>'+totalDone()+'</b></span></div>';
-  html += '<div class="hgreet"><h1>'+greet+'</h1><p>'+HARI[dd.getDay()]+', '+dd.getDate()+' '+BULAN[dd.getMonth()]+'</p>'+syncHTML()+'</div>';
-  // kartu utama: progres hari ini
-  const ms = (ic, lab, val) => '<div class="ms">'+icon(ic)+'<span>'+lab+'</span><b>'+val+'</b></div>';
+    '<span class="spill tot" title="Total hari selesai"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>'+totalDone()+'</b></span></div>'+bubble(d)+'</div>'+lumi(112)+'</div>';
+  // satu kartu: progres + minggu ini
   html += '<div class="pcard"><div class="pbig"><b class="num">'+done+'<small>/'+T.length+'</small></b><span>'+(T.length && done===T.length ? 'Semua selesai' : 'tugas selesai')+'</span>'+
     (od.length ? '<button class="odp" data-act="exp" data-id="od">'+od.length+' tertinggal</button>' : '')+'</div>'+
-    '<div class="segs">'+T.map(x => '<i class="'+(x.done?'on':x.part?'part':'')+'" title="'+esc(x.l)+'"></i>').join('')+'</div>'+
-    '<div class="mss">'+ms('habit','Habit',hb+'/3')+ms('materi','Basic', bsT.length ? bsT.filter(x=>x.done).length+'/'+bsT.length : '–')+ms('vnew','Vocab', voT.length ? voT.filter(x=>x.done).length+'/'+voT.length : '–')+'</div></div>';
-  if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
-  // minggu ini
+    '<div class="segs">'+T.map(x => '<i class="'+(x.done?'on':x.part?'part':'')+'" title="'+esc(x.l)+'"></i>').join('')+'</div>';
   const mon = mondayOf(d);
-  html += '<div class="stk"><div class="wkl">';
+  html += '<div class="wkrow"><button class="wnav" data-act="day" data-n="-7" aria-label="Minggu sebelumnya">‹</button><div class="wkl">';
   for (let i=0;i<7;i++){ const x = addDays(mon,i), out = x<FIRST||x>LAST, ok = !out && x<=today && streakOK(x), fut = x>today, q = out||fut ? null : dayPct(x), pt = !ok && q!==null;
     html += '<button class="wd'+(ok?' ok':'')+(pt?' pt':'')+(fut?' fut':'')+(x===d?' sel':'')+(x===today?' today':'')+(out?' out':'')+'" data-act="goto" data-d="'+x+'" aria-label="'+fmtLong(x)+(q!==null?', '+Math.round(q*100)+'% selesai':'')+'"><span class="wl">'+['S','S','R','K','J','S','M'][i]+'</span><span class="wc" style="--p:'+(q===null?0:Math.round(q*100))+'">'+(ok?'<svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg>':'<em>'+pd(x).getDate()+'</em>')+'</span></button>'; }
-  html += '</div></div>';
+  html += '</div><button class="wnav" data-act="day" data-n="7" aria-label="Minggu berikutnya">›</button></div></div>';
+  if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
 
   // daftar tugas
   html += '<div class="th"><b>Habit</b><span class="thc'+(hb===3?' ok':'')+'">'+hb+'/3</span></div><div class="tasks">'+HABITS.map(([f,l]) => hTog('h'+d,f,esc(l),h[f],f)).join('')+'</div>';
@@ -971,12 +1038,15 @@ function weakWords(c){
 }
 function vWeak(c){
   const L = weakWords(c), tot = L.reduce((z,x)=>z+x.w.length,0);
-  if (!L.length) return sh('Belum dikuasai')+'<div class="group plain"><div class="row"><div class="rt"><div class="t">Semua kata di kategori ini sudah dikuasai</div></div></div></div>';
-  return sh('Belum dikuasai', tot+' kata')+'<div class="group plain weak">'+
-    '<button class="btnrow" data-act="copyw" data-l="all">Salin semua ('+tot+' kata)</button>'+
+  if (!L.length) return sh('Belum dikuasai')+'<div class="group plain"><div class="row"><div class="rt"><div class="s">Semua kata sudah dikuasai</div></div></div></div>';
+  const cp = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7.5a2 2 0 002 2h2.5"/></svg>';
+  return sh('Belum dikuasai', '<button class="lnk" data-act="copyw" data-l="all">Salin semua ('+tot+')</button>')+'<div class="group plain weak">'+
     L.map(x => { const fresh = x.w.length === c.lists[x.li].w.length, id = 'ww'+c.c+x.li, op = !fresh || ST.open.has(id);
-      return '<div class="wl-row"><div class="wl-h">'+(fresh ? '<button class="wl-t'+(op?' open':'')+'" data-act="exp" data-id="'+id+'" aria-expanded="'+op+'"><b>'+esc(x.n)+'</b><span>'+x.w.length+'</span><span class="chev"></span></button>' : '<b>'+esc(x.n)+'</b><span>'+x.w.length+'</span>')+
-        '<button class="cpb" data-act="copyw" data-l="'+x.li+'">Salin</button></div>'+(op ? '<p class="wl-w" id="ww-'+c.c+'-'+x.li+'">'+x.w.map(esc).join(', ')+'</p>' : '')+'</div>'; }).join('')+'</div>';
+      const nm = 'L'+(x.li+1);
+      return '<div class="wk-r">'+(fresh && !op
+        ? '<button class="wk-t" data-act="exp" data-id="'+id+'"><b>'+nm+'</b><span class="wk-w muted">'+x.w.length+' kata belum mulai</span></button>'
+        : '<button class="wk-t" '+(fresh?'data-act="exp" data-id="'+id+'"':'tabindex="-1"')+'><b>'+nm+'</b><span class="wk-w" id="ww-'+c.c+'-'+x.li+'">'+x.w.map(esc).join(', ')+'</span></button>')+
+        '<button class="cpi" data-act="copyw" data-l="'+x.li+'" aria-label="Salin '+x.w.length+' kata">'+cp+'</button></div>'; }).join('')+'</div>';
 }
 function vVocab(){
   const c = CAT[ST.vcat], [n,t] = catProgress(c.c);
@@ -1086,6 +1156,7 @@ document.addEventListener('click', e => {
   else if (act==='delerr'){ const id = b.dataset.id; if (ST.confirm==='del-'+id){ ST.confirm=null; setField(id,'deleted',true); toast('Soal dihapus'); } else { ST.confirm='del-'+id; render(); } }
   else if (act==='askshift'){ ST.confirm='shift-'+b.dataset.s; render(); }
   else if (act==='shift'){ shiftSessions(+b.dataset.s); }
+  else if (act==='lumi'){ const pool = TIPS[ST.view]; ST.tip = ST.tipView===ST.view && ST.tip!=null ? (ST.tip + 1) % pool.length : Math.floor(Math.random()*pool.length); ST.tipView = ST.view; render(); const m = document.querySelector('.lumi .mascot'); if (m) m.classList.add('hop'); }
   else if (act==='copyw'){ const c = CAT[ST.vcat], L = weakWords(c), sel = b.dataset.l==='all' ? L : L.filter(x => String(x.li)===b.dataset.l);
     const tx = sel.flatMap(x => x.w).join(', '), n = sel.reduce((z,x)=>z+x.w.length,0);
     const manual = () => { const el = b.dataset.l==='all' ? null : document.getElementById('ww-'+c.c+'-'+b.dataset.l); if (el){ const r = document.createRange(); r.selectNodeContents(el); const sl = getSelection(); sl.removeAllRanges(); sl.addRange(r); } toast(el ? 'Teks sudah dipilih, salin manual' : 'Gagal menyalin, salin per list'); };
