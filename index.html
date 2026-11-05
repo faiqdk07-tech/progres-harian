@@ -761,6 +761,13 @@ function syncOne(lsKey, pre){
   if (Object.keys(v).every(x => cur[x]===v[x])) return false;
   ST.ov[k] = v; Store.write(k); return true;
 }
+/* bagikan jadwal materi MD terbaru (ikut penundaan) ke Latihan Kuantitatif */
+function exportJadwal(){ try {
+  const S = sessions(), unit = {}, selesai = [];
+  DATA.materi.filter(x => /^MD-/.test(x.kode)).forEach(x => { unit[x.kode] = S[x.s] || null; if (eff(x.k).done) selesai.push(x.kode); });
+  const v = JSON.stringify({unit, selesai}); if (readLS('ph.jadwal.raw') === v) return;
+  localStorage.setItem('ph.jadwal', JSON.stringify({app:'progres-harian', unit, selesai, diperbarui: Date.now()})); localStorage.setItem('ph.jadwal.raw', JSON.stringify(v));
+} catch(e){} }
 function syncLatihan(){ const a = syncOne('lk.ringkas','lk'), b = syncOne('ppu.ringkas','pp'), c = syncOne('vl.ringkas','vl'); return a||b||c; }
 function ppuToday(){ const S = readLS('vocablab-id.v4'); if (!S) return null; const t = new Date().toDateString();
   const all = (S.dhist||[]).concat(S.history||[]).filter(x => x && new Date(x.ts).toDateString()===t); return {n:all.length, ok:all.filter(x => x.correct).length}; }
@@ -1165,7 +1172,7 @@ function vLainnya(){
 function autosize(el){ el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
 const VIEWS = ['hari-ini','kalender','evaluasi','vocab','lainnya'];
 function render(){
-  syncLatihan();
+  syncLatihan(); exportJadwal();
   const a = document.activeElement, id = a && a.id; let ss=null, se=null; try { ss=a.selectionStart; se=a.selectionEnd; } catch(e){}
   const V = {'hari-ini':vHari, 'kalender':vKalender, 'evaluasi':vErrors, 'vocab':vVocab, 'lainnya':vLainnya}[ST.view] || vHari;
   document.body.dataset.view = ST.view;
