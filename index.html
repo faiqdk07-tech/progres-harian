@@ -470,6 +470,10 @@ body{background:var(--wall)}
 @media (max-width:420px){.lt .lumi svg{width:84px;height:84px}.hhd .lumi svg{width:100px;height:100px}}
 @media (prefers-reduced-motion:reduce){.lumi .mascot,.lumi .mascot.hop,.bubble{animation:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* latihan harian: kartu tautan */
+.card a.row{text-decoration:none;color:inherit}
+.card a.row .s{color:var(--muted, #8e8e93)}
 </style>
 </head>
 <body>
@@ -585,6 +589,7 @@ function dayTasks(d){
   if (r.timed.length){ const n = r.timed.filter(timedBeres).length; T.push({l:'Timed drill', done: n===r.timed.length, part: n>0}); }
   if (v && v.new) T.push({l:'Vocab baru', done: vNewDone(d), part: vNewCount(d)>0});
   if (v && vRevs(v).length) T.push({l:'Vocab review', done: !!eff('v'+d).rev});
+  const lt = lkTask(d); if (lt) T.push(lt);
   return T;
 }
 function dayPct(d){ const T = dayTasks(d); return T.length ? T.filter(t=>t.done).length / T.length : null; }
@@ -721,6 +726,9 @@ const bubble = d => '<div class="bubble" aria-live="polite"><span>'+esc(ST.tipVi
 
 /* ikon tugas (kotak berwarna di kiri tiap kartu) */
 const IC = {
+  kuant:['peach','<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M8.5 12h1.5M14 12h1.5M8.5 16h1.5M14 16h1.5"/>'],
+  ppu:['sky','<path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'],
+  vlab:['lav','<path d="M4 18L8 6h1.5l4 12M5.3 14h6.4"/><path d="M15 10h5M15 14h5"/>'],
   a:['mint','<path d="M4 19h4v-4h4v-4h4V7h4"/>'],
   o:['pink','<rect x="3.5" y="9" width="17" height="6.5" rx="3.25" transform="rotate(-35 12 12.25)"/><path d="M9.6 8.4l4.6 6.8"/>'],
   b:['sky','<path d="M12 3c3.6 0 6 2.8 6 6.2 0 3.8-3 6.8-6 6.8s-6-3-6-6.8C6 5.8 8.4 3 12 3z"/><path d="M12 16l-1 2h2l-1-2zM12 18c0 2-2 2.5-1 4"/>'],
@@ -734,6 +742,35 @@ const IC = {
   move:['peach','<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15h6M13 13l2 2-2 2"/>'],
   link:['mint','<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/>'],
 };
+
+/* ---------- Latihan harian (app lain di domain yang sama) ---------- */
+const LK_START = '2026-11-05';
+const APPS = [
+  {id:'kuant', t:'Latihan Kuantitatif', s:'PU kuantitatif, PK, PM', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/'},
+  {id:'ppu', t:'Latihan PPU & PBM', s:'EYD, kebahasaan, teks PBM/PPU', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/'},
+  {id:'vlab', t:'Vocab Lab', s:'Kosakata Literasi Bahasa Inggris', url:'https://faiqdk07-tech.github.io/vocab-lab/'}
+];
+function readLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+/* salin ringkasan Latihan Kuantitatif hari ini ke data progres agar ikut tersimpan di akun */
+function syncLatihan(){
+  const r = readLS('lk.ringkas'); if (!r || !r.tanggal || !isFinite(r.tugas_total)) return false;
+  const k = 'lk'+r.tanggal, cur = ST.ov[k] || {};
+  if (cur.s===r.tugas_selesai && cur.n===r.tugas_total && cur.q===r.soal && cur.b===r.benar) return false;
+  ST.ov[k] = {s:r.tugas_selesai, n:r.tugas_total, q:r.soal, b:r.benar}; Store.write(k); return true;
+}
+function ppuToday(){ const S = readLS('vocablab-id.v4'); if (!S) return null; const t = new Date().toDateString();
+  const all = (S.dhist||[]).concat(S.history||[]).filter(x => x && new Date(x.ts).toDateString()===t); return {n:all.length, ok:all.filter(x => x.correct).length}; }
+function lkTask(d){ if (d < LK_START || pd(d).getDay()===0) return null; const q = eff('lk'+d); return {l:'Latihan kuantitatif', done: !!q.n && q.s>=q.n, part: q.s>0}; }
+function vLatihan(d){
+  const isT = d===todayStr(), q = eff('lk'+d), has = !!q.n, lt = lkTask(d);
+  const row = (a, sub, rv, chk) => '<div class="card"><a class="row" href="'+a.url+'">'+icon(a.id)+'<div class="rt"><div class="t">'+esc(a.t)+'</div><div class="s">'+sub+'</div></div>'+(rv?'<div class="rv">'+rv+'</div>':'')+(chk||'<span class="chev"></span>')+'</a></div>';
+  const ks = has ? q.q+' soal'+(q.q?' · '+Math.round(q.b*100/q.q)+'% benar':'') : (isT ? 'Belum dibuka hari ini' : (d < LK_START ? APPS[0].s : 'Tidak ada catatan'));
+  let h = row(APPS[0], esc(ks), has ? badge(q.s+'/'+q.n, q.s>=q.n?'b-ok':q.s?'b-warn':'b-0') : '', lt ? chkShow(lt.done, lt.part) : '');
+  const p = isT ? ppuToday() : null;
+  h += row(APPS[1], esc(p && p.n ? p.n+' soal hari ini · '+Math.round(p.ok*100/p.n)+'% benar' : APPS[1].s), '', '');
+  h += row(APPS[2], esc(APPS[2].s), '', '');
+  return '<div class="th"><b>Latihan harian</b>'+(lt ? '<span class="thc'+(lt.done?' ok':'')+'">'+(has?q.s+'/'+q.n:'0/5')+'</span>' : '')+'</div><div class="tasks">'+h+'</div>';
+}
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
 const hTog = (k,f,title,on,ic) => '<button class="row" data-act="tog" data-k="'+k+'" data-f="'+f+'" aria-pressed="'+!!on+'">'+icon(ic)+'<div class="rt"><div class="t">'+title+'</div></div><span class="chk '+(on?'on':'')+'" aria-hidden="true"></span></button>';
@@ -770,6 +807,7 @@ function vHari(){
 
   // daftar tugas
   html += '<div class="th"><b>Habit</b><span class="thc'+(hb===3?' ok':'')+'">'+hb+'/3</span></div><div class="tasks">'+HABITS.map(([f,l]) => hTog('h'+d,f,esc(l),h[f],f)).join('')+'</div>';
+  html += vLatihan(d);
   let g = '';
   r.materi.forEach(x => { const q = eff(x.k), stt = matStatus(q);
     const tdp = (f,tt) => '<td class="'+(isNum(q[f])?(q[f]>=tt?'hit':'miss'):'')+'">'+cell(x.k,f,q[f],'pct')+'</td>';
@@ -1118,6 +1156,7 @@ function vLainnya(){
 function autosize(el){ el.style.height = 'auto'; el.style.height = (el.scrollHeight + 2) + 'px'; }
 const VIEWS = ['hari-ini','kalender','evaluasi','vocab','lainnya'];
 function render(){
+  syncLatihan();
   const a = document.activeElement, id = a && a.id; let ss=null, se=null; try { ss=a.selectionStart; se=a.selectionEnd; } catch(e){}
   const V = {'hari-ini':vHari, 'kalender':vKalender, 'evaluasi':vErrors, 'vocab':vVocab, 'lainnya':vLainnya}[ST.view] || vHari;
   document.body.dataset.view = ST.view;
@@ -1300,6 +1339,8 @@ function applyTheme(t){ if (t==='light' || t==='dark') document.documentElement.
 applyTheme(getTheme());
 ST.date = (() => { const t = todayStr(); return t < FIRST ? FIRST : t > LAST ? LAST : t; })();
 window.addEventListener('hashchange', route);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible') render(); });
+window.addEventListener('pageshow', e => { if (e.persisted) render(); });
 ST.view = viewFromHash();
 Store.init();
 </script>
