@@ -474,6 +474,7 @@ body{background:var(--wall)}
 /* latihan harian: kartu tautan */
 .card a.row{text-decoration:none;color:inherit}
 .card a.row .s{color:var(--muted, #8e8e93)}
+.applogo{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;font:800 11.5px/1 system-ui,-apple-system,sans-serif;letter-spacing:.02em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
 </style>
 </head>
 <body>
@@ -590,6 +591,7 @@ function dayTasks(d){
   if (v && v.new) T.push({l:'Vocab baru', done: vNewDone(d), part: vNewCount(d)>0});
   if (v && vRevs(v).length) T.push({l:'Vocab review', done: !!eff('v'+d).rev});
   const lt = lkTask(d); if (lt) T.push(lt);
+  const pt = ppTask(d); if (pt) T.push(pt);
   return T;
 }
 function dayPct(d){ const T = dayTasks(d); return T.length ? T.filter(t=>t.done).length / T.length : null; }
@@ -746,30 +748,37 @@ const IC = {
 /* ---------- Latihan harian (app lain di domain yang sama) ---------- */
 const LK_START = '2026-11-05';
 const APPS = [
-  {id:'kuant', t:'Latihan Kuantitatif', s:'PU kuantitatif, PK, PM', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/'},
-  {id:'ppu', t:'Latihan PPU & PBM', s:'EYD, kebahasaan, teks PBM/PPU', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/'},
-  {id:'vlab', t:'Vocab Lab', s:'Kosakata Literasi Bahasa Inggris', url:'https://faiqdk07-tech.github.io/vocab-lab/'}
+  {id:'kuant', t:'Latihan Kuantitatif', s:'PU kuantitatif, PK, PM', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/', lg:'LK', c:'linear-gradient(135deg,#FF8E78,#EE5E4A)'},
+  {id:'ppu', t:'Latihan PPU & PBM', s:'EYD, kebahasaan, teks PBM/PPU', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/', lg:'PB', c:'linear-gradient(135deg,#34C3B3,#1C9486)'},
+  {id:'vlab', t:'Vocab Lab', s:'Kosakata Literasi Bahasa Inggris', url:'https://faiqdk07-tech.github.io/vocab-lab/', lg:'VL', c:'linear-gradient(135deg,#3B8BFF,#5B5BE0)'}
 ];
 function readLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
 /* salin ringkasan Latihan Kuantitatif hari ini ke data progres agar ikut tersimpan di akun */
-function syncLatihan(){
-  const r = readLS('lk.ringkas'); if (!r || !r.tanggal || !isFinite(r.tugas_total)) return false;
-  const k = 'lk'+r.tanggal, cur = ST.ov[k] || {};
-  if (cur.s===r.tugas_selesai && cur.n===r.tugas_total && cur.q===r.soal && cur.b===r.benar) return false;
-  ST.ov[k] = {s:r.tugas_selesai, n:r.tugas_total, q:r.soal, b:r.benar}; Store.write(k); return true;
+function syncOne(lsKey, pre){
+  const r = readLS(lsKey); if (!r || !r.tanggal) return false;
+  const v = 'jawab' in r ? {q:r.jawab, b:r.benar} : {s:r.tugas_selesai, n:r.tugas_total, q:r.soal, b:r.benar};
+  const k = pre+r.tanggal, cur = ST.ov[k] || {};
+  if (Object.keys(v).every(x => cur[x]===v[x])) return false;
+  ST.ov[k] = v; Store.write(k); return true;
 }
+function syncLatihan(){ const a = syncOne('lk.ringkas','lk'), b = syncOne('ppu.ringkas','pp'), c = syncOne('vl.ringkas','vl'); return a||b||c; }
 function ppuToday(){ const S = readLS('vocablab-id.v4'); if (!S) return null; const t = new Date().toDateString();
   const all = (S.dhist||[]).concat(S.history||[]).filter(x => x && new Date(x.ts).toDateString()===t); return {n:all.length, ok:all.filter(x => x.correct).length}; }
+const PP_START = '2026-11-06';
 function lkTask(d){ if (d < LK_START || pd(d).getDay()===0) return null; const q = eff('lk'+d); return {l:'Latihan kuantitatif', done: !!q.n && q.s>=q.n, part: q.s>0}; }
+function ppTask(d){ if (d < PP_START || pd(d).getDay()===0) return null; const q = eff('pp'+d); return {l:'Latihan PPU & PBM', done: !!q.n && q.s>=q.n, part: q.s>0}; }
 function vLatihan(d){
-  const isT = d===todayStr(), q = eff('lk'+d), has = !!q.n, lt = lkTask(d);
-  const row = (a, sub, rv, chk) => '<div class="card"><a class="row" href="'+a.url+'">'+icon(a.id)+'<div class="rt"><div class="t">'+esc(a.t)+'</div><div class="s">'+sub+'</div></div>'+(rv?'<div class="rv">'+rv+'</div>':'')+(chk||'<span class="chev"></span>')+'</a></div>';
-  const ks = has ? q.q+' soal'+(q.q?' · '+Math.round(q.b*100/q.q)+'% benar':'') : (isT ? 'Belum dibuka hari ini' : (d < LK_START ? APPS[0].s : 'Tidak ada catatan'));
-  let h = row(APPS[0], esc(ks), has ? badge(q.s+'/'+q.n, q.s>=q.n?'b-ok':q.s?'b-warn':'b-0') : '', lt ? chkShow(lt.done, lt.part) : '');
-  const p = isT ? ppuToday() : null;
-  h += row(APPS[1], esc(p && p.n ? p.n+' soal hari ini · '+Math.round(p.ok*100/p.n)+'% benar' : APPS[1].s), '', '');
-  h += row(APPS[2], esc(APPS[2].s), '', '');
-  return '<div class="th"><b>Latihan harian</b>'+(lt ? '<span class="thc'+(lt.done?' ok':'')+'">'+(has?q.s+'/'+q.n:'0/5')+'</span>' : '')+'</div><div class="tasks">'+h+'</div>';
+  const isT = d===todayStr();
+  const row = (a, sub, rv, chk) => '<div class="card"><a class="row" href="'+a.url+'"><span class="applogo" style="background:'+a.c+'" aria-hidden="true">'+a.lg+'</span>'+'<div class="rt"><div class="t">'+esc(a.t)+'</div><div class="s">'+sub+'</div></div>'+(rv?'<div class="rv">'+rv+'</div>':'')+(chk||'<span class="chev"></span>')+'</a></div>';
+  const info = (q, empty) => q.q ? q.q+' soal'+(q.q?' · '+Math.round(q.b*100/q.q)+'% benar':'') : empty;
+  const tug = (q, task) => q.n ? badge(q.s+'/'+q.n, q.s>=q.n?'b-ok':q.s?'b-warn':'b-0') : (task ? badge('0/5','b-0') : '');
+  const lq = eff('lk'+d), pq = eff('pp'+d), vq = eff('vl'+d), lt = lkTask(d), pt = ppTask(d);
+  const kosong = isT ? 'Belum dibuka hari ini' : 'Tidak ada catatan';
+  let h = row(APPS[0], esc(info(lq, d < LK_START ? APPS[0].s : kosong)), tug(lq, lt), lt ? chkShow(lt.done, lt.part) : '');
+  h += row(APPS[1], esc(info(pq, d < PP_START && !pq.q ? APPS[1].s : kosong)), tug(pq, pt), pt ? chkShow(pt.done, pt.part) : '');
+  h += row(APPS[2], esc(vq.q ? vq.q+' kata dilatih · '+Math.round(vq.b*100/vq.q)+'% benar' : (isT ? 'Belum latihan hari ini' : APPS[2].s)), '', '');
+  const ts = [lt && [lq.s||0, lq.n||5], pt && [pq.s||0, pq.n||5]].filter(Boolean), sd = ts.reduce((z,x)=>z+x[0],0), sn = ts.reduce((z,x)=>z+x[1],0);
+  return '<div class="th"><b>Latihan harian</b>'+(sn ? '<span class="thc'+(sd>=sn?' ok':'')+'">'+sd+'/'+sn+' tugas</span>' : '')+'</div><div class="tasks">'+h+'</div>';
 }
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
