@@ -475,6 +475,9 @@ body{background:var(--wall)}
 .card a.row{text-decoration:none;color:inherit}
 .card a.row .s{color:var(--muted, #8e8e93)}
 .applogo{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#fff;font:800 11.5px/1 system-ui,-apple-system,sans-serif;letter-spacing:.02em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.hrow{padding:0 16px 0 0}
+.hlink{display:flex;align-items:center;gap:12px;flex:1;min-width:0;min-height:44px;padding:10px 0 10px 16px;color:inherit;text-decoration:none}
+.hrow .chk{width:26px;height:26px}
 </style>
 </head>
 <body>
@@ -573,7 +576,8 @@ const vday = d => vdays().find(v => v.d === d);
 const vRevs = v => v ? [['H+1',v.r1],['H+3',v.r3],['H+7',v.r7]].filter(x => x[1]) : [];
 function vNewDone(d){ const q = eff('v'+d); return VSTEPS.every(([f]) => q[f]); }
 function vNewCount(d){ const q = eff('v'+d); return VSTEPS.filter(([f]) => q[f]).length; }
-const HABITS = [['a','Anak Tangga'],['o','Obat Fokus'],['b','Balon Helium']];
+const HABITS = [['o','Obat Fokus','Literasi Bahasa Indonesia','ind'],['b','Balon Helium','Literasi Bahasa Inggris','eng']];
+const RB_URL = 'https://faiqdk07-tech.github.io/ruang-baca/';
 
 function dayRows(d){
   const ss = sessionsOn(d);
@@ -702,7 +706,7 @@ const POSE = {'hari-ini':'wave', kalender:'calendar', evaluasi:'search', vocab:'
 const lumi = (size) => '<button class="lumi" data-act="lumi" aria-label="Lumi, ketuk untuk semangat">'+mascot(todayMood(), size, POSE[ST.view])+'</button>';
 const TIPS = {
   'hari-ini': ['Satu centang kecil tetap kemajuan.','Konsisten mengalahkan semangat sesaat.','Fokus 25 menit dulu, sisanya nyusul.','Istirahat boleh, berhenti jangan.','Mulai dari habit, biar mesinnya panas.','Hari ini lebih baik dari kemarin, itu cukup.'],
-  kalender: ['Kotak hijau berturut-turut = streak aman.','Jadwal tertinggal? Geser, jangan ditumpuk.','Sedikit tiap hari lebih kuat dari ngebut sehari.','Isi durasi belajar biar kelihatan polanya.','Minggu libur Basic Skills, habit tetap jalan.'],
+  kalender: ['Kotak hijau berturut-turut = streak aman.','Jadwal tertinggal? Geser, jangan ditumpuk.','Sedikit tiap hari lebih kuat dari ngebut sehari.','Isi durasi belajar biar kelihatan polanya.','Minggu libur Basic Skills, habit literasi tetap jalan.'],
   evaluasi: ['Soal salah itu harta karun. Bedah polanya.','Salah baca soal? Garis bawahi kata kuncinya.','Kehabisan waktu? Latih timed drill lagi.','Salah konsep? Balik ke materi, jangan langsung soal.','Di UTBK, kerjakan dulu soal yang kamu yakin.','Penalaran Umum menguji pola pikir, bukan hafalan.'],
   vocab: ['Baca pertanyaannya dulu, baru cari di teks.','Tebak arti dari konteks sebelum buka kamus.','Satu paket vocab sehari sudah cukup.','Ulang kata lemah di Vocab Lab malam ini.','Kata akademik sering muncul di teks UTBK.'],
   lainnya: ['Akurasi review di bawah target? Ulang unitnya.','Persen, rasio, pecahan wajib lancar untuk PK.','Tryout juga latihan mental. Duduk fokus tanpa HP.','Tidur cukup bikin materi lebih nempel.','Simpan cadangan data sesekali, biar aman.']
@@ -750,7 +754,8 @@ const LK_START = '2026-11-05';
 const APPS = [
   {id:'kuant', t:'Latihan Kuantitatif', s:'PU kuantitatif, PK, PM', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/', lg:'LK', c:'linear-gradient(135deg,#FF8E78,#EE5E4A)'},
   {id:'ppu', t:'Latihan PPU & PBM', s:'EYD, kebahasaan, teks PBM/PPU', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/', lg:'PB', c:'linear-gradient(135deg,#34C3B3,#1C9486)'},
-  {id:'vlab', t:'Vocab Lab', s:'Kosakata Literasi Bahasa Inggris', url:'https://faiqdk07-tech.github.io/vocab-lab/', lg:'VL', c:'linear-gradient(135deg,#3B8BFF,#5B5BE0)'}
+  {id:'vlab', t:'Vocab Lab', s:'Kosakata Literasi Bahasa Inggris', url:'https://faiqdk07-tech.github.io/vocab-lab/', lg:'VL', c:'linear-gradient(135deg,#3B8BFF,#5B5BE0)'},
+  {id:'rbaca', t:'Ruang Baca', s:'Literasi Bahasa Indonesia & Inggris', url:'https://faiqdk07-tech.github.io/ruang-baca/', lg:'RB', c:'linear-gradient(135deg,#FFC24D,#F08A1C)'}
 ];
 function readLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
 /* salin ringkasan Latihan Kuantitatif hari ini ke data progres agar ikut tersimpan di akun */
@@ -768,7 +773,25 @@ function exportJadwal(){ try {
   const v = JSON.stringify({unit, selesai}); if (readLS('ph.jadwal.raw') === v) return;
   localStorage.setItem('ph.jadwal', JSON.stringify({app:'progres-harian', unit, selesai, diperbarui: Date.now()})); localStorage.setItem('ph.jadwal.raw', JSON.stringify(v));
 } catch(e){} }
-function syncLatihan(){ const a = syncOne('lk.ringkas','lk'), b = syncOne('ppu.ringkas','pp'), c = syncOne('vl.ringkas','vl'); return a||b||c; }
+/* Ruang Baca: paket yang diselesaikan hari ini (dari riwayat rb-hist) */
+function syncBaca(){
+  const H = readLS('rb-hist'); if (!H || typeof H!=='object') return false;
+  const t = todayStr(), v = {p:0, q:0, b:0, li:0, le:0};
+  Object.values(H).forEach(x => { if (!x || !x.d || !x.n) return; const d = new Date(x.d), k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if (k!==t) return; v.p++; v.q += x.n; v.b += x.b||0; if (/ind/i.test(x.sub||'')) v.li++; else v.le++; });
+  let ch = false;
+  /* centang habit literasi otomatis: Obat Fokus = Bahasa Indonesia, Balon Helium = Bahasa Inggris */
+  const byDay = {};
+  Object.values(H).forEach(x => { if (!x || !x.d || !x.n) return; const d = new Date(x.d), k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const o = byDay[k] = byDay[k] || {}; if (/ind/i.test(x.sub||'')) o.o = true; else o.b = true; });
+  Object.keys(byDay).forEach(k => { const hk = 'h'+k, cur = ST.ov[hk] || {}, add = {};
+    ['o','b'].forEach(f => { if (byDay[k][f] && !cur[f] && !(DATA.base[hk]||{})[f]) add[f] = true; });
+    if (Object.keys(add).length){ ST.ov[hk] = Object.assign({}, cur, add); Store.write(hk); ch = true; } });
+  if (!v.p) return ch;
+  const k = 'rb'+t, cur = ST.ov[k] || {}; if (Object.keys(v).every(x => cur[x]===v[x])) return ch;
+  ST.ov[k] = v; Store.write(k); return true;
+}
+function syncLatihan(){ const a = syncOne('lk.ringkas','lk'), b = syncOne('ppu.ringkas','pp'), c = syncOne('vl.ringkas','vl'), d = syncBaca(); return a||b||c||d; }
 function ppuToday(){ const S = readLS('vocablab-id.v4'); if (!S) return null; const t = new Date().toDateString();
   const all = (S.dhist||[]).concat(S.history||[]).filter(x => x && new Date(x.ts).toDateString()===t); return {n:all.length, ok:all.filter(x => x.correct).length}; }
 const PP_START = '2026-11-06';
@@ -784,12 +807,21 @@ function vLatihan(d){
   let h = row(APPS[0], esc(info(lq, d < LK_START ? APPS[0].s : kosong)), tug(lq, lt), lt ? chkShow(lt.done, lt.part) : '');
   h += row(APPS[1], esc(info(pq, d < PP_START && !pq.q ? APPS[1].s : kosong)), tug(pq, pt), pt ? chkShow(pt.done, pt.part) : '');
   h += row(APPS[2], esc(vq.q ? vq.q+' kata dilatih · '+Math.round(vq.b*100/vq.q)+'% benar' : (isT ? 'Belum latihan hari ini' : APPS[2].s)), '', '');
+  const rq = eff('rb'+d), rsub = [rq.li?rq.li+' Indonesia':'', rq.le?rq.le+' Inggris':''].filter(Boolean).join(', ');
+  h += row(APPS[3], esc(rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar'+(rsub?' · '+rsub:'') : (isT ? 'Belum membaca hari ini' : APPS[3].s)), rq.p ? badge(rq.p+' paket','b-ok') : '', '');
   const ts = [lt && [lq.s||0, lq.n||5], pt && [pq.s||0, pq.n||5]].filter(Boolean), sd = ts.reduce((z,x)=>z+x[0],0), sn = ts.reduce((z,x)=>z+x[1],0);
   return '<div class="th"><b>Latihan harian</b>'+(sn ? '<span class="thc'+(sd>=sn?' ok':'')+'">'+sd+'/'+sn+' tugas</span>' : '')+'</div><div class="tasks">'+h+'</div>';
 }
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
 const hTog = (k,f,title,on,ic) => '<button class="row" data-act="tog" data-k="'+k+'" data-f="'+f+'" aria-pressed="'+!!on+'">'+icon(ic)+'<div class="rt"><div class="t">'+title+'</div></div><span class="chk '+(on?'on':'')+'" aria-hidden="true"></span></button>';
+/* habit literasi: baris membuka Ruang Baca, lingkaran tetap bisa dicentang manual */
+function hLink(d, [f, l, sub, kind], h){
+  const q = eff('rb'+d), n = kind==='ind' ? (q.li||0) : (q.le||0), on = !!h[f];
+  const info = sub + (n ? ' · '+n+' paket hari ini' : '');
+  return '<div class="row hrow"><a class="hlink" href="'+RB_URL+(kind==='ind'?'#indonesia':'#inggris')+'">'+icon(f)+'<div class="rt"><div class="t">'+esc(l)+'</div><div class="s">'+esc(info)+'</div></div></a>'+
+    '<button class="chk '+(on?'on':'')+'" data-act="tog" data-k="h'+d+'" data-f="'+f+'" aria-pressed="'+on+'" aria-label="Tandai '+esc(l)+' selesai"></button></div>';
+}
 function hX(id, ic, check, title, rv, inner){
   const op = ST.open.has(id);
   return '<div class="card'+(op?' open':'')+'"><button class="row" data-act="exp" data-id="'+id+'" aria-expanded="'+op+'">'+icon(ic)+'<div class="rt"><div class="t">'+title+'</div></div>'+(rv?'<div class="rv">'+rv+'</div>':'')+check+'</button>'+(op?'<div class="xp">'+inner+'</div>':'')+'</div>';
@@ -822,7 +854,7 @@ function vHari(){
   if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
 
   // daftar tugas
-  html += '<div class="th"><b>Habit</b><span class="thc'+(hb===3?' ok':'')+'">'+hb+'/3</span></div><div class="tasks">'+HABITS.map(([f,l]) => hTog('h'+d,f,esc(l),h[f],f)).join('')+'</div>';
+  html += '<div class="th"><b>Habit</b><span class="thc'+(hb===HABITS.length?' ok':'')+'">'+hb+'/'+HABITS.length+'</span></div><div class="tasks">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div>';
   html += vLatihan(d);
   let g = '';
   r.materi.forEach(x => { const q = eff(x.k), stt = matStatus(q);
