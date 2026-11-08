@@ -801,12 +801,15 @@ function syncOne(lsKey, pre){
   if (Object.keys(v).every(x => cur[x]===v[x])) return false;
   ST.ov[k] = v; Store.write(k); return true;
 }
-/* bagikan jadwal materi MD terbaru (ikut penundaan) ke Latihan Kuantitatif */
+/* bagikan jadwal materi (lama v7 + baru v13, ikut penundaan) ke Latihan Kuantitatif */
 function exportJadwal(){ try {
   const S = oldSessions(), unit = {}, selesai = [];
   DATA.materi.filter(x => /^MD-/.test(x.kode)).forEach(x => { unit[x.kode] = S[x.s] || null; if (eff(x.k).done) selesai.push(x.kode); });
-  const v = JSON.stringify({unit, selesai}); if (readLS('ph.jadwal.raw') === v) return;
-  localStorage.setItem('ph.jadwal', JSON.stringify({app:'progres-harian', unit, selesai, diperbarui: Date.now()})); localStorage.setItem('ph.jadwal.raw', JSON.stringify(v));
+  /* jadwal v13 (materi baru): Matematika Dasar BIL/ALJ/GEO/DAT + PU kuantitatif U3-PU, ikut penundaan */
+  const S2 = sessions(), unit2 = {}, selesai2 = [];
+  BS.materi.filter(x => /^(BIL|ALJ|GEO|DAT)-|^U\d-PU/.test(x.kode)).forEach(x => { unit2[x.kode] = S2[x.s] || null; if (matBeres(x)) selesai2.push(x.kode); });
+  const v = JSON.stringify({unit, selesai, unit2, selesai2}); if (readLS('ph.jadwal.raw') === v) return;
+  localStorage.setItem('ph.jadwal', JSON.stringify({app:'progres-harian', unit, selesai, cut: CUT, unit2, selesai2, diperbarui: Date.now()})); localStorage.setItem('ph.jadwal.raw', JSON.stringify(v));
 } catch(e){} }
 /* Ruang Baca: paket yang diselesaikan hari ini (dari riwayat rb-hist) */
 function syncBaca(){
