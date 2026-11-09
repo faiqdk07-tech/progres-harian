@@ -885,7 +885,6 @@ function vHari(){
 
   // daftar tugas
   html += '<div class="th"><b>Habit</b><span class="thc'+(hb===HABITS.length?' ok':'')+'">'+hb+'/'+HABITS.length+'</span></div><div class="tasks">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div>';
-  html += vLatihan(d);
   let g = '';
   r.materi.forEach(x => { const q = eff(x.k), stt = matStatus(q);
     const tdp = (f,tt) => '<td class="'+(isNum(q[f])?(q[f]>=tt?'hit':'miss'):'')+'">'+cell(x.k,f,q[f],'pct')+'</td>';
@@ -924,6 +923,8 @@ function vHari(){
   }
   const bsTitle = r.arsip ? 'Basic Skills (v7)' : 'Mat Dasar + UTBK per Unit';
   html += '<div class="th"><b>'+bsTitle+'</b>'+(r.ss.length?'<span>Sesi '+r.ss.join(', ')+'</span>':'')+'</div><div class="tasks">'+(g || '<div class="card"><div class="row"><div class="rt"><div class="t muted">'+(d < CUT ? 'Tidak ada jadwal Basic Skills' : 'Tidak ada jadwal hari ini')+'</div></div></div></div>')+'</div>';
+  // Latihan harian dipindahkan setelah Basic Skills
+  html += vLatihan(d);
   // vocab
   let vg = '';
   if (v){ const q = eff('v'+d);
