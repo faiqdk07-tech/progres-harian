@@ -517,7 +517,7 @@ body{background:var(--wall)}
 .sno svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
 .rvn{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
 .ext{font-size:14px;color:var(--muted);opacity:.7;flex:none;width:12px;text-align:center}
-.steps .card>.xp{padding:2px 16px 16px 52px}
+.steps .card>.xp{padding:2px 14px 16px 16px}
 .steps .row.bedah{padding:8px 0;min-height:40px}
 .steps.more{margin-top:16px}
 .steps.more>*+*::before{left:16px}
@@ -998,8 +998,8 @@ function vHari(){
   const acc = (q, unit) => q.q ? q.q+' '+unit+' · '+Math.round(q.b*100/q.q)+'% benar' : '';
   const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
   const apps = [];
-  if (lt) apps.push({t:'Latihan Kuantitatif', s:acc(lq,'soal') || APPS[0].s, url:APPS[0].url, st:stc(lt.done, lt.part), rv:cnt(lq, lt)});
-  if (pt) apps.push({t:'Latihan PPU & PBM', s:acc(pq,'soal') || APPS[1].s, url:APPS[1].url, st:stc(pt.done, pt.part), rv:cnt(pq, pt)});
+  apps.push({t:'Latihan Kuantitatif', s:acc(lq,'soal') || APPS[0].s, url:APPS[0].url, st:lt ? stc(lt.done, lt.part) : '', rv:cnt(lq, lt)});
+  apps.push({t:'Latihan PPU & PBM', s:acc(pq,'soal') || APPS[1].s, url:APPS[1].url, st:pt ? stc(pt.done, pt.part) : '', rv:cnt(pq, pt)});
   apps.push({t:'Vocab Lab', s:acc(vq,'kata') || APPS[2].s, url:APPS[2].url, st:vq.q ? 'on' : ''});
   const S = [{t:'Habit', s:HABITS.map(x => x[1]).join(' · '), id:'hab'+d, st:stc(hb===HABITS.length, hb>0), rv:hb+'/'+HABITS.length,
     inner:'<div class="sub">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div><div class="hint">Ketuk nama habit untuk membuka Alternatifa, centang lingkaran setelah selesai.</div>'}];
@@ -1007,7 +1007,7 @@ function vHari(){
   r.materi.forEach(x => {
     if (ai < apps.length) S.push(apps[ai++]);
     const stt = matStatus(eff(x.k)), utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
-    S.push({t:esc(x.sub)+(x.ke?' <span class="ke">'+esc(x.ke)+'</span>':''), s:esc(x.kode)+' · '+(r.arsip ? 'Basic Skills' : utbk ? 'UTBK · '+esc(subjShort(x.subj)) : 'Matematika Dasar'),
+    S.push({t:esc(x.sub)+(x.ke?' <span class="ke">'+esc(x.ke)+'</span>':''), s:esc(x.kode)+' · '+(r.arsip ? 'Basic Skills (v7)' : (utbk ? 'UTBK · '+esc(subjShort(x.subj)) : 'Matematika Dasar')+(x.ch ? ' · '+esc(x.ch) : '')), rv:stt,
       id:'m'+x.k, st:stc(stt==='Lengkap', stt==='Proses', stt==='Perlu ulang'), inner:XP['m'+x.k]});
   });
   while (ai < apps.length) S.push(apps[ai++]);
@@ -1015,12 +1015,16 @@ function vHari(){
     S.push({t:'Review campur', s:r.review.length+' unit', id:'rev'+d, st:stc(n===r.review.length, n>0), rv:n+'/'+r.review.length, inner:XP['rev'+d]}); }
   if (r.timed.length){ const n = r.timed.filter(timedBeres).length;
     S.push({t:'Timed drill', s:r.timed.map(x => subjShort(x.subj)).join(', '), id:'tim'+d, st:stc(n===r.timed.length, n>0), rv:n+'/'+r.timed.length, inner:XP['tim'+d]}); }
-  S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : ''});
-  if (v && (v.new || vRevs(v).length)){
+  S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : '', rv:rq.p ? rq.p+' paket' : ''});
+  if (v){
     const q = eff('v'+d), rvs = vRevs(v), okN = !v.new || vNewDone(d), okR = !rvs.length || !!q.rev;
-    S.push({t:'Vocab malam', s:[v.new ? 'Paket '+esc(v.new) : '', rvs.length ? 'review '+rvs.length+' paket' : ''].filter(Boolean).join(' + '), id:'vm'+d,
-      st:stc(okN && okR, (v.new && vNewCount(d)>0) || !!q.rev),
-      inner:(v.new ? '<div class="lbl">Paket baru '+esc(v.new)+'</div>'+XP['vn'+d] : '')+(rvs.length ? '<div class="lbl">Review</div>'+XP['vr'+d] : '')+txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote)});
+    if (v.new){ const [m,tt] = paketMastery(v.new);
+      XP['vn'+d] = '<div class="sub">'+VSTEPS.map(([f,l]) => togRow('v'+d,f,l,'',q[f])).join('')+'</div><div class="lbl">Kata '+m+'/'+tt+'</div>'+paketChips(v.new); }
+    if (rvs.length) XP['vr'+d] = '<div class="sub">'+togRow('v'+d,'rev','Review selesai','',q.rev)+'</div>'+rvs.map(([hh,c]) => { const [m,tt] = paketMastery(c);
+        return '<div class="rvh"><span class="badge b-0">'+hh+'</span>'+code(c)+'<span class="hint" style="margin-left:auto">'+m+'/'+tt+'</span></div>'+paketChips(c); }).join('');
+    S.push({t:'Vocab malam', s:[v.new ? 'Paket '+esc(v.new) : '', rvs.length ? 'review '+rvs.map(x => esc(x[1])).join(', ') : ''].filter(Boolean).join(' + ') || 'Tidak ada paket · catatan vocab', id:'vm'+d,
+      st:(v.new || rvs.length) ? stc(okN && okR, (v.new && vNewCount(d)>0) || !!q.rev) : '',
+      inner:(v.new ? '<div class="lbl">Paket baru '+esc(v.new)+' · '+vNewCount(d)+'/4</div>'+XP['vn'+d] : '')+(rvs.length ? '<div class="lbl">Review vocab'+(q.rev?' · Selesai':'')+'</div>'+XP['vr'+d] : '')+txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote)});
   }
   const CK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.5 3.5 7.5-8"/></svg>';
   const stepRow = (i, x) => {
@@ -1031,7 +1035,7 @@ function vHari(){
     return '<div class="card'+(op?' open':'')+'"><button class="'+cls+'" data-act="exp" data-id="'+x.id+'" aria-expanded="'+op+'">'+body+'<span class="chev"></span></button>'+(op ? '<div class="xp">'+(x.inner||'')+'</div>' : '')+'</div>';
   };
   const sDone = S.filter(x => x.st==='on').length;
-  html += '<div class="th"><b>Urutan belajar</b><span>'+sDone+'/'+S.length+' langkah</span></div><div class="tasks steps">'+S.map((x,i) => stepRow(i+1, x)).join('')+'</div>';
+  html += '<div class="th"><b>Urutan belajar</b><span>'+(r.ss.length ? 'Sesi '+r.ss.join(', ')+' · ' : '')+sDone+'/'+S.length+' langkah</span></div><div class="tasks steps">'+S.map((x,i) => stepRow(i+1, x)).join('')+'</div>';
   if (!r.materi.length && !r.review.length && !r.timed.length) html += '<div class="hint" style="padding:8px 4px 0">'+(d < CUT ? 'Tidak ada jadwal Basic Skills hari ini.' : 'Tidak ada materi hari ini.')+'</div>';
   let atur = '';
   // ubah jadwal
