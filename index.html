@@ -488,6 +488,16 @@ body{background:var(--wall)}
 .hrow{padding:0 16px 0 0}
 .hlink{display:flex;align-items:center;gap:12px;flex:1;min-width:0;min-height:44px;padding:10px 0 10px 16px;color:inherit;text-decoration:none}
 .hrow .chk{width:26px;height:26px}
+
+/* Urutan belajar harian — panduan tambahan, fitur lain tetap */
+.study-order .study-step{display:flex;align-items:center;gap:12px;min-height:49px;padding:9px 16px;position:relative;color:inherit;text-decoration:none}
+.study-order .study-step+.study-step::before{content:"";position:absolute;top:0;left:54px;right:0;height:.5px;background:var(--sep)}
+.study-order .step-no{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--card2);box-shadow:inset 0 0 0 .5px var(--rim);color:var(--blue);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.study-order .study-step .rt{flex:1;min-width:0}
+.study-order .study-step .t{font-size:16px;overflow-wrap:break-word}
+.study-order .study-step .s{font-size:13px;color:var(--muted);margin-top:2px;overflow-wrap:break-word}
+.study-order .study-step:active{background:var(--fill)}
+
 </style>
 </head>
 <body>
@@ -843,6 +853,27 @@ function vLatihan(d){
   const ts = [lt && [lq.s||0, lq.n||5], pt && [pq.s||0, pq.n||5]].filter(Boolean), sd = ts.reduce((z,x)=>z+x[0],0), sn = ts.reduce((z,x)=>z+x[1],0);
   return '<div class="th"><b>Latihan harian</b>'+(sn ? '<span class="thc'+(sd>=sn?' ok':'')+'">'+sd+'/'+sn+' tugas</span>' : '')+'</div><div class="tasks">'+h+'</div>';
 }
+const STUDY_ORDER = [
+  {t:'Habit Alternatifa / preparation', s:'Mulai dengan persiapan dan habit', url:HABIT_URL},
+  {t:'Latihan Kuantitatif', s:APPS[0].s, url:APPS[0].url},
+  {t:'Mat Dasar Unit 1', s:'Materi Matematika Dasar di bagian Basic Skills'},
+  {t:'Latihan PPU & PBM', s:APPS[1].s, url:APPS[1].url},
+  {t:'Mat Dasar Unit 2', s:'Lanjutkan materi Matematika Dasar di bagian Basic Skills'},
+  {t:'Vocab Lab', s:APPS[2].s, url:APPS[2].url},
+  {t:'Overview Argumen (PU)', s:'Materi PU di bagian Basic Skills'},
+  {t:'Review campur', s:'Kerjakan sesi Review campur di bagian Basic Skills'},
+  {t:'Ruang Baca', s:APPS[3].s, url:APPS[3].url},
+  {t:'Vocab malam', s:'Selesaikan paket baru dan review vocab di bagian Vocab malam'}
+];
+function vUrutanBelajar(){
+  const rows = STUDY_ORDER.map((x,i) => {
+    const body = '<span class="step-no">'+(i+1)+'</span><div class="rt"><div class="t">'+esc(x.t)+'</div><div class="s">'+esc(x.s)+'</div></div>'+(x.url?'<span class="chev"></span>':'');
+    return x.url
+      ? '<a class="study-step" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+body+'</a>'
+      : '<div class="study-step">'+body+'</div>';
+  }).join('');
+  return '<div class="th"><b>Urutan belajar</b><span>Ikuti dari 1–10</span></div><div class="tasks study-order">'+rows+'</div>';
+}
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
 const hTog = (k,f,title,on,ic) => '<button class="row" data-act="tog" data-k="'+k+'" data-f="'+f+'" aria-pressed="'+!!on+'">'+icon(ic)+'<div class="rt"><div class="t">'+title+'</div></div><span class="chk '+(on?'on':'')+'" aria-hidden="true"></span></button>';
@@ -883,8 +914,12 @@ function vHari(){
   html += '</div><button class="wnav" data-act="day" data-n="7" aria-label="Minggu berikutnya">›</button></div></div>';
   if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
 
+  // Panduan urutan belajar; seluruh panel tugas asli di bawah tetap dipertahankan
+  html += vUrutanBelajar();
+
   // daftar tugas
   html += '<div class="th"><b>Habit</b><span class="thc'+(hb===HABITS.length?' ok':'')+'">'+hb+'/'+HABITS.length+'</span></div><div class="tasks">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div>';
+  html += vLatihan(d);
   let g = '';
   r.materi.forEach(x => { const q = eff(x.k), stt = matStatus(q);
     const tdp = (f,tt) => '<td class="'+(isNum(q[f])?(q[f]>=tt?'hit':'miss'):'')+'">'+cell(x.k,f,q[f],'pct')+'</td>';
@@ -923,8 +958,6 @@ function vHari(){
   }
   const bsTitle = r.arsip ? 'Basic Skills (v7)' : 'Mat Dasar + UTBK per Unit';
   html += '<div class="th"><b>'+bsTitle+'</b>'+(r.ss.length?'<span>Sesi '+r.ss.join(', ')+'</span>':'')+'</div><div class="tasks">'+(g || '<div class="card"><div class="row"><div class="rt"><div class="t muted">'+(d < CUT ? 'Tidak ada jadwal Basic Skills' : 'Tidak ada jadwal hari ini')+'</div></div></div></div>')+'</div>';
-  // Latihan harian dipindahkan setelah Basic Skills
-  html += vLatihan(d);
   // vocab
   let vg = '';
   if (v){ const q = eff('v'+d);
