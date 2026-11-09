@@ -524,6 +524,9 @@ body{background:var(--wall)}
 .steps .xp .sub{margin-left:-8px}
 .steps .xp .hrow{min-height:44px;padding:6px 8px}
 .steps .xp .hrow .ic{width:26px;height:26px}
+.steps .lk{padding-right:10px}
+.steps .lka{display:flex;align-items:center;gap:12px;flex:1;min-width:0;color:inherit;text-decoration:none}
+.steps .tg{flex:none;border:0;background:var(--fill);color:var(--blue);font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer}
 .steps .ke{font-size:13px;color:var(--muted);font-weight:400}
 </style>
 </head>
@@ -1000,7 +1003,6 @@ function vHari(){
   const apps = [];
   apps.push({t:'Latihan Kuantitatif', s:acc(lq,'soal') || APPS[0].s, url:APPS[0].url, st:lt ? stc(lt.done, lt.part) : '', rv:cnt(lq, lt)});
   apps.push({t:'Latihan PPU & PBM', s:acc(pq,'soal') || APPS[1].s, url:APPS[1].url, st:pt ? stc(pt.done, pt.part) : '', rv:cnt(pq, pt)});
-  apps.push({t:'Vocab Lab', s:acc(vq,'kata') || APPS[2].s, url:APPS[2].url, st:vq.q ? 'on' : ''});
   const S = [{t:'Habit', s:HABITS.map(x => x[1]).join(' · '), id:'hab'+d, st:stc(hb===HABITS.length, hb>0), rv:hb+'/'+HABITS.length,
     inner:'<div class="sub">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div><div class="hint">Ketuk nama habit untuk membuka Alternatifa, centang lingkaran setelah selesai.</div>'}];
   let ai = 0;
@@ -1016,21 +1018,30 @@ function vHari(){
   if (r.timed.length){ const n = r.timed.filter(timedBeres).length;
     S.push({t:'Timed drill', s:r.timed.map(x => subjShort(x.subj)).join(', '), id:'tim'+d, st:stc(n===r.timed.length, n>0), rv:n+'/'+r.timed.length, inner:XP['tim'+d]}); }
   S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : '', rv:rq.p ? rq.p+' paket' : ''});
+  // vocab: daily vocab (GPT, Practice Awal, review) -> Vocab Lab -> Practice Malam
+  const vqd = v ? eff('v'+d) : {}, vLabSub = acc(vq,'kata') || APPS[2].s;
   if (v){
-    const q = eff('v'+d), rvs = vRevs(v), okN = !v.new || vNewDone(d), okR = !rvs.length || !!q.rev;
-    if (v.new){ const [m,tt] = paketMastery(v.new);
-      XP['vn'+d] = '<div class="sub">'+VSTEPS.map(([f,l]) => togRow('v'+d,f,l,'',q[f])).join('')+'</div><div class="lbl">Kata '+m+'/'+tt+'</div>'+paketChips(v.new); }
-    if (rvs.length) XP['vr'+d] = '<div class="sub">'+togRow('v'+d,'rev','Review selesai','',q.rev)+'</div>'+rvs.map(([hh,c]) => { const [m,tt] = paketMastery(c);
-        return '<div class="rvh"><span class="badge b-0">'+hh+'</span>'+code(c)+'<span class="hint" style="margin-left:auto">'+m+'/'+tt+'</span></div>'+paketChips(c); }).join('');
-    S.push({t:'Vocab malam', s:[v.new ? 'Paket '+esc(v.new) : '', rvs.length ? 'review '+rvs.map(x => esc(x[1])).join(', ') : ''].filter(Boolean).join(' + ') || 'Tidak ada paket · catatan vocab', id:'vm'+d,
-      st:(v.new || rvs.length) ? stc(okN && okR, (v.new && vNewCount(d)>0) || !!q.rev) : '',
-      inner:(v.new ? '<div class="lbl">Paket baru '+esc(v.new)+' · '+vNewCount(d)+'/4</div>'+XP['vn'+d] : '')+(rvs.length ? '<div class="lbl">Review vocab'+(q.rev?' · Selesai':'')+'</div>'+XP['vr'+d] : '')+txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote)});
+    const q = vqd, rvs = vRevs(v), [m,tt] = v.new ? paketMastery(v.new) : [0,0];
+    const awal = v.new ? ['gpt','pa'] : [], nA = awal.filter(f => q[f]).length;
+    const dn = nA===awal.length && (!rvs.length || !!q.rev), pt0 = nA>0 || !!q.rev;
+    let inner = '';
+    if (v.new) inner += '<div class="lbl">Paket baru '+esc(v.new)+' · '+vNewCount(d)+'/4</div><div class="sub">'+VSTEPS.filter(([f]) => awal.includes(f)).map(([f,l]) => togRow('v'+d,f,l,'',q[f])).join('')+'</div><div class="lbl">Kata '+m+'/'+tt+'</div>'+paketChips(v.new);
+    if (rvs.length) inner += '<div class="lbl">Review vocab'+(q.rev?' · Selesai':'')+'</div><div class="sub">'+togRow('v'+d,'rev','Review selesai','',q.rev)+'</div>'+rvs.map(([hh,c]) => { const [m2,t2] = paketMastery(c);
+        return '<div class="rvh"><span class="badge b-0">'+hh+'</span>'+code(c)+'<span class="hint" style="margin-left:auto">'+m2+'/'+t2+'</span></div>'+paketChips(c); }).join('');
+    inner += txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote);
+    S.push({t:'Daily vocab', s:[v.new ? 'Paket '+esc(v.new)+' · GPT + Practice Awal' : '', rvs.length ? 'review '+rvs.map(x => esc(x[1])).join(', ') : ''].filter(Boolean).join(' + ') || 'Tidak ada paket · catatan vocab', id:'vm'+d,
+      st:(v.new || rvs.length) ? stc(dn, pt0) : '', rv:(awal.length+(rvs.length?1:0)) ? (nA+(q.rev?1:0))+'/'+(awal.length+(rvs.length?1:0)) : '', inner});
   }
+  if (v && v.new) S.push({t:'Vocab Lab', s:vLabSub, url:APPS[2].url, st:vqd.lab ? 'on' : '', tog:['v'+d,'lab',!!vqd.lab]});
+  else S.push({t:'Vocab Lab', s:vLabSub, url:APPS[2].url, st:vq.q ? 'on' : ''});
+  if (v && v.new) S.push({t:'Practice Malam', s:'Paket '+esc(v.new), st:vqd.pm ? 'on' : '', tog:['v'+d,'pm',!!vqd.pm], row:true});
   const CK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.5 3.5 7.5-8"/></svg>';
   const stepRow = (i, x) => {
     const op = x.id && ST.open.has(x.id);
     const body = '<span class="sno '+x.st+'">'+(x.st==='on' ? CK : i)+'</span><div class="rt"><div class="t">'+(x.url ? esc(x.t) : x.t)+'</div>'+(x.s ? '<div class="s">'+(x.url ? esc(x.s) : x.s)+'</div>' : '')+'</div>'+(x.rv ? '<span class="rvn">'+esc(x.rv)+'</span>' : '');
     const cls = 'row step'+(x.st==='on' ? ' done' : '');
+    if (x.row) return '<div class="card"><button class="'+cls+'" data-act="tog" data-k="'+x.tog[0]+'" data-f="'+x.tog[1]+'" aria-pressed="'+x.tog[2]+'">'+body+'<span class="tg">'+(x.tog[2] ? 'Batal' : 'Tandai')+'</span></button></div>';
+    if (x.url && x.tog) return '<div class="card"><div class="'+cls+' lk"><a class="lka" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+body+'<span class="ext" aria-hidden="true">↗</span></a><button class="tg" data-act="tog" data-k="'+x.tog[0]+'" data-f="'+x.tog[1]+'" aria-pressed="'+x.tog[2]+'">'+(x.tog[2] ? 'Batal' : 'Tandai')+'</button></div></div>';
     if (x.url) return '<div class="card"><a class="'+cls+'" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+body+'<span class="ext" aria-hidden="true">↗</span></a></div>';
     return '<div class="card'+(op?' open':'')+'"><button class="'+cls+'" data-act="exp" data-id="'+x.id+'" aria-expanded="'+op+'">'+body+'<span class="chev"></span></button>'+(op ? '<div class="xp">'+(x.inner||'')+'</div>' : '')+'</div>';
   };
