@@ -1374,7 +1374,7 @@ function render(){
   $('#main').innerHTML = V();
   document.querySelectorAll('#tabs a').forEach(x => x.setAttribute('aria-current', x.getAttribute('href')==='#'+ST.view ? 'page' : 'false'));
   if (id){ const el = document.getElementById(id); if (el && el !== document.body){ el.focus({preventScroll:true}); try { if (ss!==null) el.setSelectionRange(ss,se); } catch(e){} } }
-  const f = $('#errForm'); if (f) f.onsubmit = addError;
+  const f = $('#errForm'); if (f){ f.onsubmit = addError; fillDraft(); document.querySelectorAll('#errForm textarea').forEach(autosize); }
   document.querySelectorAll('textarea.txt').forEach(autosize);
   const imp = $('#imp'); if (imp) imp.onchange = e => { const file = e.target.files[0]; if (!file) return; const rd = new FileReader(); rd.onload = () => importText(rd.result); rd.readAsText(file); };
 }
@@ -1407,7 +1407,7 @@ document.addEventListener('click', e => {
     if (!NEXT[cur] || NEXT[cur][0]!==b.dataset.v) return; ST.confirm=null;
     const ov = Object.assign({}, ST.ov[e.id]||{}, {status:b.dataset.v}); ov[b.dataset.v==='Ulang benar'?'tglUlang':'tglBedah'] = todayStr();
     ST.ov[e.id] = ov; Store.write(e.id); if (ST.errFilter!=='semua') ST.errFilter = b.dataset.v; render(); toast('Status: '+b.dataset.v); }
-  else if (act==='adderr'){ ST.addErr = !ST.addErr; render(); }
+  else if (act==='adderr'){ if (ST.addErr) clearDraft(); ST.addErr = !ST.addErr; render(); }
   else if (act==='vcat'){ ST.vcat = b.dataset.v; ST.vq=''; ST.open.delete('vcats'); render(); }
   else if (act==='delerr'){ const id = b.dataset.id; if (ST.confirm==='del-'+id){ ST.confirm=null; setField(id,'deleted',true); toast('Soal dihapus'); } else { ST.confirm='del-'+id; render(); } }
   else if (act==='askshift'){ ST.confirm='shift-'+b.dataset.s; render(); }
@@ -1465,11 +1465,21 @@ function shiftSessions(from){
   Object.keys(S).map(Number).filter(s => s>=from && S[s] && !SUNS.has(s)).forEach(s => { let d = addDays(S[s],1); while (pd(d).getDay()===0 || HOLI.includes(d)) d = addDays(d,1); cur[s] = d; });
   ST.ov.sessions2 = cur; ST.confirm=null; Store.write('sessions2'); render(); toast('Sesi '+from+' dan setelahnya digeser 1 hari');
 }
+/* draf formulir soal salah: disimpan tiap ketikan, supaya tidak hilang saat pindah aplikasi / halaman dimuat ulang */
+const DRAFT = 'ph.errdraft';
+function saveDraft(){ const f = $('#errForm'); if (!f) return; try { localStorage.setItem(DRAFT, JSON.stringify({f:Object.fromEntries(new FormData(f)), subj:ST.subj})); } catch(e){} }
+function readDraft(){ const d = readLS(DRAFT); return d && d.f ? d : null; }
+function clearDraft(){ try { localStorage.removeItem(DRAFT); } catch(e){} }
+function fillDraft(){ const f = $('#errForm'), d = readDraft(); if (!f || !d) return;
+  for (const [k,v] of Object.entries(d.f)){ const el = f.elements[k]; if (el && v !== '' && el.value !== v) el.value = v; } }
+const draftHasText = d => d && ['soal','jawabku','bahas'].some(k => (d.f[k]||'').trim());
+document.addEventListener('input', e => { if (e.target.closest && e.target.closest('#errForm')) saveDraft(); });
+document.addEventListener('change', e => { if (e.target.closest && e.target.closest('#errForm')) saveDraft(); });
 function addError(e){
   e.preventDefault();
   const f = new FormData(e.target), id = 'x'+Date.now();
   ST.ov[id] = {kode:f.get('kode'), tgl:f.get('tgl'), jenis:f.get('jenis'), asal:f.get('asal'), soal:f.get('soal'), jawabku:f.get('jawabku')||null, bahas:f.get('bahas')||null, status:'Belum dibedah'};
-  Store.write(id); ST.errFilter='terbuka'; ST.addErr=false; render(); toast('Soal salah tersimpan');
+  Store.write(id); clearDraft(); ST.errFilter='terbuka'; ST.addErr=false; render(); toast('Soal salah tersimpan');
 }
 
 
@@ -1551,9 +1561,10 @@ function applyTheme(t){ if (t==='light' || t==='dark') document.documentElement.
 applyTheme(getTheme());
 ST.date = (() => { const t = todayStr(); return t < FIRST ? FIRST : t > LAST ? LAST : t; })();
 window.addEventListener('hashchange', route);
-document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible') render(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState!=='visible') return; if ($('#errForm')){ saveDraft(); syncLatihan(); return; } render(); });
 window.addEventListener('pageshow', e => { if (e.persisted) render(); });
 ST.view = viewFromHash();
+{ const d = readDraft(); if (draftHasText(d)){ ST.addErr = true; ST.evalTab = 'soal'; if (d.subj) ST.subj = d.subj; } }
 Store.init();
 </script>
 
