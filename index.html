@@ -853,26 +853,38 @@ function vLatihan(d){
   const ts = [lt && [lq.s||0, lq.n||5], pt && [pq.s||0, pq.n||5]].filter(Boolean), sd = ts.reduce((z,x)=>z+x[0],0), sn = ts.reduce((z,x)=>z+x[1],0);
   return '<div class="th"><b>Latihan harian</b>'+(sn ? '<span class="thc'+(sd>=sn?' ok':'')+'">'+sd+'/'+sn+' tugas</span>' : '')+'</div><div class="tasks">'+h+'</div>';
 }
-const STUDY_ORDER = [
-  {t:'Habit Alternatifa / preparation', s:'Mulai dengan persiapan dan habit', url:HABIT_URL},
-  {t:'Latihan Kuantitatif', s:APPS[0].s, url:APPS[0].url},
-  {t:'Mat Dasar Unit 1', s:'Materi Matematika Dasar di bagian Basic Skills'},
-  {t:'Latihan PPU & PBM', s:APPS[1].s, url:APPS[1].url},
-  {t:'Mat Dasar Unit 2', s:'Lanjutkan materi Matematika Dasar di bagian Basic Skills'},
-  {t:'Vocab Lab', s:APPS[2].s, url:APPS[2].url},
-  {t:'Overview Argumen (PU)', s:'Materi PU di bagian Basic Skills'},
-  {t:'Review campur', s:'Kerjakan sesi Review campur di bagian Basic Skills'},
-  {t:'Ruang Baca', s:APPS[3].s, url:APPS[3].url},
-  {t:'Vocab malam', s:'Selesaikan paket baru dan review vocab di bagian Vocab malam'}
-];
-function vUrutanBelajar(){
-  const rows = STUDY_ORDER.map((x,i) => {
+/* Urutan belajar disusun dari jadwal tanggal yang dipilih (bukan daftar tetap) */
+function studyOrder(d){
+  const r = dayRows(d), v = vday(d), steps = [];
+  steps.push({t:'Habit Alternatifa / preparation', s:'Mulai dengan persiapan dan habit', url:HABIT_URL});
+  const apps = [];
+  if (lkTask(d)) apps.push({t:'Latihan Kuantitatif', s:APPS[0].s, url:APPS[0].url});
+  if (ppTask(d)) apps.push({t:'Latihan PPU & PBM', s:APPS[1].s, url:APPS[1].url});
+  apps.push({t:'Vocab Lab', s:APPS[2].s, url:APPS[2].url});
+  const mat = r.materi.map(x => {
+    const utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
+    const nm = /^Mat/.test(x.subj||'') ? 'Mat Dasar' : utbk ? subjShort(x.subj) : (x.subj||'Materi');
+    return {t: nm+' · '+(x.sub||x.ch||'')+(x.ke?' '+x.ke:''),
+      s: (x.kode?x.kode+' · ':'')+(r.arsip ? 'Basic Skills (v7)' : utbk ? 'UTBK per Unit'+(x.ch?' · '+x.ch:'') : 'Matematika Dasar'+(x.ch?' · '+x.ch:''))};
+  });
+  let ai = 0;
+  mat.forEach(m => { if (ai < apps.length) steps.push(apps[ai++]); steps.push(m); });
+  while (ai < apps.length) steps.push(apps[ai++]);
+  if (r.review.length) steps.push({t:'Review campur', s:r.review.length+' baris review di bagian '+(r.arsip?'Basic Skills':'Mat Dasar + UTBK per Unit')});
+  if (r.timed.length) steps.push({t:'Timed drill', s:r.timed.map(x => subjShort(x.subj)).join(', ')});
+  steps.push({t:'Ruang Baca', s:APPS[3].s, url:APPS[3].url});
+  if (v && (v.new || vRevs(v).length)) steps.push({t:'Vocab malam', s:[v.new?'Paket baru '+v.new:'', vRevs(v).length?'review '+vRevs(v).map(x=>x[1]).join(', '):''].filter(Boolean).join(' + ')});
+  return steps;
+}
+function vUrutanBelajar(d){
+  const order = studyOrder(d);
+  const rows = order.map((x,i) => {
     const body = '<span class="step-no">'+(i+1)+'</span><div class="rt"><div class="t">'+esc(x.t)+'</div><div class="s">'+esc(x.s)+'</div></div>'+(x.url?'<span class="chev"></span>':'');
     return x.url
       ? '<a class="study-step" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+body+'</a>'
       : '<div class="study-step">'+body+'</div>';
   }).join('');
-  return '<div class="th"><b>Urutan belajar</b><span>Ikuti dari 1–10</span></div><div class="tasks study-order">'+rows+'</div>';
+  return '<div class="th"><b>Urutan belajar</b><span>Ikuti dari 1–'+order.length+'</span></div><div class="tasks study-order">'+rows+'</div>';
 }
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
@@ -915,7 +927,7 @@ function vHari(){
   if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
 
   // Panduan urutan belajar; seluruh panel tugas asli di bawah tetap dipertahankan
-  html += vUrutanBelajar();
+  html += vUrutanBelajar(d);
 
   // daftar tugas
   html += '<div class="th"><b>Habit</b><span class="thc'+(hb===HABITS.length?' ok':'')+'">'+hb+'/'+HABITS.length+'</span></div><div class="tasks">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div>';
