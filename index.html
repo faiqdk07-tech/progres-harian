@@ -498,6 +498,33 @@ body{background:var(--wall)}
 .study-order .study-step .s{font-size:13px;color:var(--muted);margin-top:2px;overflow-wrap:break-word}
 .study-order .study-step:active{background:var(--fill)}
 
+
+/* ---------- halaman utama sederhana ---------- */
+.home .bubble{width:auto!important;height:auto;margin:8px 0 0!important;padding:0;background:none;box-shadow:none;border-radius:0;font-size:13.5px!important;color:var(--muted);animation:none;display:block}
+.home .bubble::after{display:none}
+.home .bubble>span{-webkit-line-clamp:2}
+.hhd .lumi{margin:0 -4px 0 0}
+@media (max-width:420px){.hhd .lumi svg{width:72px;height:72px}}
+.steps>*+*::before{left:52px}
+.steps .row.step{gap:12px;min-height:52px;padding:9px 14px 9px 16px;text-decoration:none;color:var(--ink)}
+.steps .step .t{font-size:15.5px;line-height:1.3;overflow-wrap:anywhere}
+.steps .step .s{font-size:12.5px;color:var(--muted);margin-top:1px;overflow-wrap:anywhere}
+.steps .step.done .t{color:var(--muted)}
+.sno{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted);box-shadow:inset 0 0 0 1.5px var(--sep)}
+.sno.on{background:var(--green);box-shadow:none}
+.sno.part{color:var(--orange);box-shadow:inset 0 0 0 1.5px var(--orange)}
+.sno.warn{color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+.sno svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.rvn{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.ext{font-size:14px;color:var(--muted);opacity:.7;flex:none;width:12px;text-align:center}
+.steps .card>.xp{padding:2px 16px 16px 52px}
+.steps .row.bedah{padding:8px 0;min-height:40px}
+.steps.more{margin-top:16px}
+.steps.more>*+*::before{left:16px}
+.steps .xp .sub{margin-left:-8px}
+.steps .xp .hrow{min-height:44px;padding:6px 8px}
+.steps .xp .hrow .ic{width:26px;height:26px}
+.steps .ke{font-size:13px;color:var(--muted);font-weight:400}
 </style>
 </head>
 <body>
@@ -914,7 +941,7 @@ function vHari(){
   const on = streakOK(today);
   html += '<div class="hhd"><div class="hgreet"><h1>'+greet+'</h1><p>'+HARI[dd.getDay()]+', '+dd.getDate()+' '+BULAN[dd.getMonth()]+(d!==today?' · <button class="lnk" data-act="today">Hari ini</button>':'')+'</p>'+syncHTML()+'<div class="pills">'+
     '<span class="spill'+(on?'':' off')+'" title="Streak"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.2 5.4 4.2 10a4.2 4.2 0 01-8.4 0c0-1.7.8-3 1.8-4 .1 1.6.9 2.6 1.9 3 0-3.4-.7-6.4.5-9z" fill="currentColor"/></svg><b>'+streak()+'</b></span>'+
-    '<span class="spill tot" title="Total hari selesai"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>'+totalDone()+'</b></span></div>'+bubble(d)+'</div>'+lumi(112)+'</div>';
+    '<span class="spill tot" title="Total hari selesai"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 12.3l3 3 6-6.3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><b>'+totalDone()+'</b></span></div>'+bubble(d)+'</div>'+lumi(76)+'</div>';
   // satu kartu: progres + minggu ini
   html += '<div class="pcard"><div class="pbig"><b class="num">'+done+'<small>/'+T.length+'</small></b><span>'+(T.length && done===T.length ? 'Semua selesai' : 'tugas selesai')+'</span>'+
     (od.length ? '<button class="odp" data-act="exp" data-id="od">'+od.length+' tertinggal</button>' : '')+'</div>'+
@@ -926,12 +953,9 @@ function vHari(){
   html += '</div><button class="wnav" data-act="day" data-n="7" aria-label="Minggu berikutnya">›</button></div></div>';
   if (od.length && ST.open.has('od')) html += '<div class="tasks" style="margin-top:10px">'+od.map(o => '<div class="card"><button class="row" data-act="goto" data-d="'+o.d+'">'+icon('timed')+'<div class="rt"><div class="t">'+esc(o.t)+'</div><div class="s">'+fmtLong(o.d)+'</div></div><span class="chev"></span></button></div>').join('')+'</div>';
 
-  // Panduan urutan belajar; seluruh panel tugas asli di bawah tetap dipertahankan
-  html += vUrutanBelajar(d);
-
-  // daftar tugas
-  html += '<div class="th"><b>Habit</b><span class="thc'+(hb===HABITS.length?' ok':'')+'">'+hb+'/'+HABITS.length+'</span></div><div class="tasks">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div>';
-  html += vLatihan(d);
+  // isi detail tiap langkah dikumpulkan (hX lokal), lalu ditampilkan dalam satu daftar berurutan
+  const XP = {};
+  const hX = (id, ic, check, title, rv, inner) => { XP[id] = inner; return ''; };
   let g = '';
   r.materi.forEach(x => { const q = eff(x.k), stt = matStatus(q);
     const tdp = (f,tt) => '<td class="'+(isNum(q[f])?(q[f]>=tt?'hit':'miss'):'')+'">'+cell(x.k,f,q[f],'pct')+'</td>';
@@ -955,7 +979,7 @@ function vHari(){
         revGroups(salah).map(([lbl, cls, xs]) => gh(lbl.split(' · ±')[0], 5, cls) + xs.map(x => { const q = eff(x.k); return '<tr><td class="l">'+code(x.unit)+'</td>'+['K','H','W','T'].map(c=>'<td>'+cell(x.k,c,q[c],'num')+'</td>').join('')+'</tr>'; }).join('')).join('')+'</tbody></table></div>'+
         '<div class="hint">K konsep · H baca soal · W waktu · T teliti</div>' : ''));
     const open = r.arsip ? [] : errors().filter(e => errOpen(e) && errSesi(e) === d);
-    if (open.length) g += '<div class="card"><button class="row" data-act="toerrs">'+icon('bedah')+'<div class="rt"><div class="t">Bedah soal salah</div></div><div class="rv"><span class="dotn">'+open.length+'</span></div><span class="chev"></span></button></div>';
+    if (open.length) XP['rev'+d] += '<button class="row bedah" data-act="toerrs">'+icon('bedah')+'<div class="rt"><div class="t">Bedah '+open.length+' soal salah</div></div><span class="chev"></span></button>';
   }
   if (r.timed.length){
     const n = r.timed.filter(timedBeres).length;
@@ -968,21 +992,48 @@ function vHari(){
         salah.map(x => { const q = eff(x.k); return '<tr><td class="l">'+code(subjCode(x.subj))+'</td>'+['K','H','W','T'].map(c=>'<td>'+cell(x.k,c,q[c],'num')+'</td>').join('')+'</tr>'; }).join('')+'</tbody></table></div>' : '')+
       (r.arsip ? '' : '<div class="hint">'+r.timed.map(x => '<b>'+esc(subjShort(x.subj))+'</b>: '+esc(x.scope)).join('<br>')+'</div>'));
   }
-  const bsTitle = r.arsip ? 'Basic Skills (v7)' : 'Mat Dasar + UTBK per Unit';
-  html += '<div class="th"><b>'+bsTitle+'</b>'+(r.ss.length?'<span>Sesi '+r.ss.join(', ')+'</span>':'')+'</div><div class="tasks">'+(g || '<div class="card"><div class="row"><div class="rt"><div class="t muted">'+(d < CUT ? 'Tidak ada jadwal Basic Skills' : 'Tidak ada jadwal hari ini')+'</div></div></div></div>')+'</div>';
-  // vocab
-  let vg = '';
-  if (v){ const q = eff('v'+d);
-    if (v.new){ const [m,tt] = paketMastery(v.new), c = vNewCount(d);
-      vg += hX('vn'+d, 'vnew', chkShow(c===4, c>0), 'Paket baru '+code(v.new), badge(c+'/4', c===4?'b-ok':c?'b-warn':'b-0'),
-        '<div class="sub">'+VSTEPS.map(([f,l]) => togRow('v'+d,f,l,'',q[f])).join('')+'</div><div class="lbl">Kata '+m+'/'+tt+'</div>'+paketChips(v.new)); }
-    const rv = vRevs(v);
-    if (rv.length) vg += hX('vr'+d, 'vrev', chkShow(!!q.rev), 'Review vocab', q.rev?badge('Selesai'):'',
-      '<div class="sub">'+togRow('v'+d,'rev','Review selesai','',q.rev)+'</div>'+rv.map(([hh,c]) => { const [m,tt] = paketMastery(c);
-        return '<div class="rvh"><span class="badge b-0">'+hh+'</span>'+code(c)+'<span class="hint" style="margin-left:auto">'+m+'/'+tt+'</span></div>'+paketChips(c); }).join(''));
-    vg += '<div class="card"><div class="xp" style="padding:12px">'+txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote)+'</div></div>';
+  // ---------- satu daftar: urutan belajar hari ini ----------
+  const stc = (done, part, warn) => done ? 'on' : warn ? 'warn' : part ? 'part' : '';
+  const lq = eff('lk'+d), pq = eff('pp'+d), vq = eff('vl'+d), rq = eff('rb'+d), lt = lkTask(d), pt = ppTask(d);
+  const acc = (q, unit) => q.q ? q.q+' '+unit+' · '+Math.round(q.b*100/q.q)+'% benar' : '';
+  const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
+  const apps = [];
+  if (lt) apps.push({t:'Latihan Kuantitatif', s:acc(lq,'soal') || APPS[0].s, url:APPS[0].url, st:stc(lt.done, lt.part), rv:cnt(lq, lt)});
+  if (pt) apps.push({t:'Latihan PPU & PBM', s:acc(pq,'soal') || APPS[1].s, url:APPS[1].url, st:stc(pt.done, pt.part), rv:cnt(pq, pt)});
+  apps.push({t:'Vocab Lab', s:acc(vq,'kata') || APPS[2].s, url:APPS[2].url, st:vq.q ? 'on' : ''});
+  const S = [{t:'Habit', s:HABITS.map(x => x[1]).join(' · '), id:'hab'+d, st:stc(hb===HABITS.length, hb>0), rv:hb+'/'+HABITS.length,
+    inner:'<div class="sub">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div><div class="hint">Ketuk nama habit untuk membuka Alternatifa, centang lingkaran setelah selesai.</div>'}];
+  let ai = 0;
+  r.materi.forEach(x => {
+    if (ai < apps.length) S.push(apps[ai++]);
+    const stt = matStatus(eff(x.k)), utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
+    S.push({t:esc(x.sub)+(x.ke?' <span class="ke">'+esc(x.ke)+'</span>':''), s:esc(x.kode)+' · '+(r.arsip ? 'Basic Skills' : utbk ? 'UTBK · '+esc(subjShort(x.subj)) : 'Matematika Dasar'),
+      id:'m'+x.k, st:stc(stt==='Lengkap', stt==='Proses', stt==='Perlu ulang'), inner:XP['m'+x.k]});
+  });
+  while (ai < apps.length) S.push(apps[ai++]);
+  if (r.review.length){ const n = r.review.filter(revBeres).length;
+    S.push({t:'Review campur', s:r.review.length+' unit', id:'rev'+d, st:stc(n===r.review.length, n>0), rv:n+'/'+r.review.length, inner:XP['rev'+d]}); }
+  if (r.timed.length){ const n = r.timed.filter(timedBeres).length;
+    S.push({t:'Timed drill', s:r.timed.map(x => subjShort(x.subj)).join(', '), id:'tim'+d, st:stc(n===r.timed.length, n>0), rv:n+'/'+r.timed.length, inner:XP['tim'+d]}); }
+  S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : ''});
+  if (v && (v.new || vRevs(v).length)){
+    const q = eff('v'+d), rvs = vRevs(v), okN = !v.new || vNewDone(d), okR = !rvs.length || !!q.rev;
+    S.push({t:'Vocab malam', s:[v.new ? 'Paket '+esc(v.new) : '', rvs.length ? 'review '+rvs.length+' paket' : ''].filter(Boolean).join(' + '), id:'vm'+d,
+      st:stc(okN && okR, (v.new && vNewCount(d)>0) || !!q.rev),
+      inner:(v.new ? '<div class="lbl">Paket baru '+esc(v.new)+'</div>'+XP['vn'+d] : '')+(rvs.length ? '<div class="lbl">Review</div>'+XP['vr'+d] : '')+txt('v'+d,'vnote','Catatan vocab (kata lemah, dll.)',q.vnote)});
   }
-  html += '<div class="th"><b>Vocab malam</b></div><div class="tasks">'+(vg || '<div class="card"><div class="row"><div class="rt"><div class="t muted">Tidak ada jadwal vocab</div></div></div></div>')+'</div>';
+  const CK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.5 3.5 7.5-8"/></svg>';
+  const stepRow = (i, x) => {
+    const op = x.id && ST.open.has(x.id);
+    const body = '<span class="sno '+x.st+'">'+(x.st==='on' ? CK : i)+'</span><div class="rt"><div class="t">'+(x.url ? esc(x.t) : x.t)+'</div>'+(x.s ? '<div class="s">'+(x.url ? esc(x.s) : x.s)+'</div>' : '')+'</div>'+(x.rv ? '<span class="rvn">'+esc(x.rv)+'</span>' : '');
+    const cls = 'row step'+(x.st==='on' ? ' done' : '');
+    if (x.url) return '<div class="card"><a class="'+cls+'" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+body+'<span class="ext" aria-hidden="true">↗</span></a></div>';
+    return '<div class="card'+(op?' open':'')+'"><button class="'+cls+'" data-act="exp" data-id="'+x.id+'" aria-expanded="'+op+'">'+body+'<span class="chev"></span></button>'+(op ? '<div class="xp">'+(x.inner||'')+'</div>' : '')+'</div>';
+  };
+  const sDone = S.filter(x => x.st==='on').length;
+  html += '<div class="th"><b>Urutan belajar</b><span>'+sDone+'/'+S.length+' langkah</span></div><div class="tasks steps">'+S.map((x,i) => stepRow(i+1, x)).join('')+'</div>';
+  if (!r.materi.length && !r.review.length && !r.timed.length) html += '<div class="hint" style="padding:8px 4px 0">'+(d < CUT ? 'Tidak ada jadwal Basic Skills hari ini.' : 'Tidak ada materi hari ini.')+'</div>';
+  let atur = '';
   // ubah jadwal
   if (d >= addDays(today,-7)){
     const un = ST.ov.undo || {}, vs = (ST.ov.vskip||{})[d], rows = [];
@@ -994,14 +1045,16 @@ function vHari(){
       ? '<button class="row" data-act="pv" data-d="'+d+'">'+icon('vnew')+'<div class="rt"><div class="t" style="color:var(--red)">Yakin tunda vocab hari ini?</div><div class="s">Paket baru dan review vocab mundur 1 hari, polanya tetap</div></div></button>'
       : '<button class="row" data-act="askpv" data-d="'+d+'">'+icon('vnew')+'<div class="rt"><div class="t">Tunda vocab</div><div class="s">Paket '+esc(v.new)+' dan review hari ini pindah ke hari berikutnya</div></div><span class="chev"></span></button>');
     if (vs) rows.push('<button class="row" data-act="undopv" data-d="'+d+'">'+icon('vnew')+'<div class="rt"><div class="t">Vocab hari ini ditunda</div></div><span class="rgo">Batalkan</span></button>');
-    if (rows.length) html += '<div class="th"><b>Ubah jadwal</b></div><div class="tasks">'+rows.join('')+'</div>';
+    atur += rows.join('');
   }
   // recap
   const dv = durOf(d);
-  html += '<div class="th"><b>Recap</b></div><div class="tasks"><div class="card"><div class="row">'+icon('timed')+'<div class="rt"><div class="t">Durasi belajar</div>'+(dv?'<div class="s">Total '+Math.floor(dv/60)+' jam '+(dv%60)+' menit</div>':'')+'</div>'+
+  atur += '<div class="card"><div class="row">'+icon('timed')+'<div class="rt"><div class="t">Durasi belajar</div>'+(dv?'<div class="s">Total '+Math.floor(dv/60)+' jam '+(dv%60)+' menit</div>':'')+'</div>'+
     '<label class="dur"><input class="din" id="dj-'+d+'" type="number" inputmode="numeric" min="0" max="24" step="1" data-k="h'+d+'" data-f="dj" data-t="num" value="'+(isNum(h.dj)?h.dj:'')+'" placeholder="0" aria-label="Jam"><span>j</span></label>'+
     '<label class="dur"><input class="din" id="dm-'+d+'" type="number" inputmode="numeric" min="0" max="59" step="1" data-k="h'+d+'" data-f="dm" data-t="num" value="'+(isNum(h.dm)?h.dm:'')+'" placeholder="0" aria-label="Menit"><span>m</span></label></div></div><div class="card"><div class="row">'+icon('link')+'<div class="rt"><input id="recap" class="rin" type="url" data-k="h'+d+'" data-f="link" data-t="text" placeholder="Tempel link recap Drive" aria-label="Link recap" value="'+esc(h.link||'')+'"></div>'+
     (h.link?'<a class="rgo" href="'+esc(h.link)+'" target="_blank" rel="noopener">Buka</a>':'')+'</div></div></div>';
+  const ao = ST.open.has('atur');
+  html += '<div class="tasks steps more"><div class="card'+(ao?' open':'')+'"><button class="row step" data-act="exp" data-id="atur" aria-expanded="'+ao+'"><div class="rt"><div class="t">Recap & ubah jadwal</div><div class="s">'+(dv ? 'Belajar '+Math.floor(dv/60)+' j '+(dv%60)+' m' : 'Durasi, link recap, tunda jadwal')+'</div></div><span class="chev"></span></button></div>'+(ao ? atur : '')+'</div>';
   return html+'</div>';
 }
 
