@@ -604,8 +604,8 @@ const vday = d => vdays().find(v => v.d === d);
 const vRevs = v => v ? [['H+1',v.r1],['H+3',v.r3],['H+7',v.r7]].filter(x => x[1]) : [];
 function vNewDone(d){ const q = eff('v'+d); return VSTEPS.every(([f]) => q[f]); }
 function vNewCount(d){ const q = eff('v'+d); return VSTEPS.filter(([f]) => q[f]).length; }
-const HABITS = [['o','Obat Fokus','Literasi Bahasa Indonesia','ind'],['b','Balon Helium','Literasi Bahasa Inggris','eng']];
-const RB_URL = 'https://faiqdk07-tech.github.io/ruang-baca/';
+const HABITS = [['a','Anak Tangga','Habit Alternatifa'],['o','Obat Fokus','Habit Alternatifa'],['b','Balon Helium','Habit Alternatifa']];
+const HABIT_URL = 'https://www.alternatifa.com/habit';
 
 function dayRows(d){
   const a = arsipOn(d); if (a) return Object.assign(a, {arsip:true});
@@ -741,7 +741,7 @@ const POSE = {'hari-ini':'wave', kalender:'calendar', evaluasi:'search', vocab:'
 const lumi = (size) => '<button class="lumi" data-act="lumi" aria-label="Lumi, ketuk untuk semangat">'+mascot(todayMood(), size, POSE[ST.view])+'</button>';
 const TIPS = {
   'hari-ini': ['Satu centang kecil tetap kemajuan.','Konsisten mengalahkan semangat sesaat.','Fokus 25 menit dulu, sisanya nyusul.','Istirahat boleh, berhenti jangan.','Mulai dari habit, biar mesinnya panas.','Hari ini lebih baik dari kemarin, itu cukup.'],
-  kalender: ['Kotak hijau berturut-turut = streak aman.','Jadwal tertinggal? Geser, jangan ditumpuk.','Sedikit tiap hari lebih kuat dari ngebut sehari.','Isi durasi belajar biar kelihatan polanya.','Minggu cukup 2 timed drill, habit literasi tetap jalan.'],
+  kalender: ['Kotak hijau berturut-turut = streak aman.','Jadwal tertinggal? Geser, jangan ditumpuk.','Sedikit tiap hari lebih kuat dari ngebut sehari.','Isi durasi belajar biar kelihatan polanya.','Minggu cukup 2 timed drill, habit tetap jalan.'],
   evaluasi: ['Soal salah itu harta karun. Bedah polanya.','Salah baca soal? Garis bawahi kata kuncinya.','Kehabisan waktu? Latih timed drill lagi.','Salah konsep? Balik ke materi, jangan langsung soal.','Di UTBK, kerjakan dulu soal yang kamu yakin.','Penalaran Umum menguji pola pikir, bukan hafalan.'],
   vocab: ['Baca pertanyaannya dulu, baru cari di teks.','Tebak arti dari konteks sebelum buka kamus.','Satu paket vocab sehari sudah cukup.','Ulang kata lemah di Vocab Lab malam ini.','Kata akademik sering muncul di teks UTBK.'],
   lainnya: ['Akurasi review di bawah target? Ulang unitnya.','Persen, rasio, pecahan wajib lancar untuk PK.','Tryout juga latihan mental. Duduk fokus tanpa HP.','Tidur cukup bikin materi lebih nempel.','Simpan cadangan data sesekali, biar aman.']
@@ -818,13 +818,6 @@ function syncBaca(){
   Object.values(H).forEach(x => { if (!x || !x.d || !x.n) return; const d = new Date(x.d), k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     if (k!==t) return; v.p++; v.q += x.n; v.b += x.b||0; if (/ind/i.test(x.sub||'')) v.li++; else v.le++; });
   let ch = false;
-  /* centang habit literasi otomatis: Obat Fokus = Bahasa Indonesia, Balon Helium = Bahasa Inggris */
-  const byDay = {};
-  Object.values(H).forEach(x => { if (!x || !x.d || !x.n) return; const d = new Date(x.d), k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const o = byDay[k] = byDay[k] || {}; if (/ind/i.test(x.sub||'')) o.o = true; else o.b = true; });
-  Object.keys(byDay).forEach(k => { const hk = 'h'+k, cur = ST.ov[hk] || {}, add = {};
-    ['o','b'].forEach(f => { if (byDay[k][f] && !cur[f] && !(DATA.base[hk]||{})[f]) add[f] = true; });
-    if (Object.keys(add).length){ ST.ov[hk] = Object.assign({}, cur, add); Store.write(hk); ch = true; } });
   if (!v.p) return ch;
   const k = 'rb'+t, cur = ST.ov[k] || {}; if (Object.keys(v).every(x => cur[x]===v[x])) return ch;
   ST.ov[k] = v; Store.write(k); return true;
@@ -853,11 +846,10 @@ function vLatihan(d){
 const icon = k => '<span class="ic ic-'+IC[k][0]+'" aria-hidden="true"><svg viewBox="0 0 24 24">'+IC[k][1]+'</svg></span>';
 /* baris kartu untuk halaman utama: ikon kiri, centang kanan */
 const hTog = (k,f,title,on,ic) => '<button class="row" data-act="tog" data-k="'+k+'" data-f="'+f+'" aria-pressed="'+!!on+'">'+icon(ic)+'<div class="rt"><div class="t">'+title+'</div></div><span class="chk '+(on?'on':'')+'" aria-hidden="true"></span></button>';
-/* habit literasi: baris membuka Ruang Baca, lingkaran tetap bisa dicentang manual */
-function hLink(d, [f, l, sub, kind], h){
-  const q = eff('rb'+d), n = kind==='ind' ? (q.li||0) : (q.le||0), on = !!h[f];
-  const info = sub + (n ? ' · '+n+' paket hari ini' : '');
-  return '<div class="row hrow"><a class="hlink" href="'+RB_URL+(kind==='ind'?'#indonesia':'#inggris')+'">'+icon(f)+'<div class="rt"><div class="t">'+esc(l)+'</div><div class="s">'+esc(info)+'</div></div></a>'+
+/* habit: baris membuka halaman Habit Alternatifa, lingkaran dicentang manual */
+function hLink(d, [f, l, info], h){
+  const on = !!h[f];
+  return '<div class="row hrow"><a class="hlink" href="'+HABIT_URL+'" target="_blank" rel="noopener">'+icon(f)+'<div class="rt"><div class="t">'+esc(l)+'</div><div class="s">'+esc(info)+'</div></div></a>'+
     '<button class="chk '+(on?'on':'')+'" data-act="tog" data-k="h'+d+'" data-f="'+f+'" aria-pressed="'+on+'" aria-label="Tandai '+esc(l)+' selesai"></button></div>';
 }
 function hX(id, ic, check, title, rv, inner){
