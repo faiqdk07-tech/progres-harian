@@ -862,6 +862,9 @@ function syncBaca(){
   const k = 'rb'+t, cur = ST.ov[k] || {}; if (Object.keys(v).every(x => cur[x]===v[x])) return ch;
   ST.ov[k] = v; Store.write(k); return true;
 }
+/* tahap pola dari Latihan PPU & PBM (hanya untuk hari ini, dibaca dari perangkat ini) */
+function ppPola(d){ if (d !== todayStr()) return ''; const r = readLS('ppu.ringkas'), p = r && r.pola; if (!p || !Array.isArray(p.tahap)) return '';
+  return ' · Pola: '+p.tahap[0]+' lama, '+p.tahap[1]+' digeser, '+p.tahap[2]+' baru'+(p.lemah ? ' · Terlemah: '+String(p.lemah.id).replace(/^(PBM|PPU)-/,'')+' '+p.lemah.p+'%' : ''); }
 function syncLatihan(){ const a = syncOne('lk.ringkas','lk'), b = syncOne('ppu.ringkas','pp'), c = syncOne('vl.ringkas','vl'), d = syncBaca(); return a||b||c||d; }
 function ppuToday(){ const S = readLS('vocablab-id.v4'); if (!S) return null; const t = new Date().toDateString();
   const all = (S.dhist||[]).concat(S.history||[]).filter(x => x && new Date(x.ts).toDateString()===t); return {n:all.length, ok:all.filter(x => x.correct).length}; }
@@ -1002,7 +1005,7 @@ function vHari(){
   const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
   const apps = [];
   apps.push({t:'Latihan Kuantitatif', s:acc(lq,'soal') || APPS[0].s, url:APPS[0].url, st:lt ? stc(lt.done, lt.part) : '', rv:cnt(lq, lt)});
-  apps.push({t:'Latihan PPU & PBM', s:acc(pq,'soal') || APPS[1].s, url:APPS[1].url, st:pt ? stc(pt.done, pt.part) : '', rv:cnt(pq, pt)});
+  apps.push({t:'Latihan PPU & PBM', s:(acc(pq,'soal') || APPS[1].s)+ppPola(d), url:APPS[1].url, st:pt ? stc(pt.done, pt.part) : '', rv:cnt(pq, pt)});
   const S = [{t:'Habit', s:HABITS.map(x => x[1]).join(' · '), id:'hab'+d, st:stc(hb===HABITS.length, hb>0), rv:hb+'/'+HABITS.length,
     inner:'<div class="sub">'+HABITS.map(hab => hLink(d, hab, h)).join('')+'</div><div class="hint">Ketuk nama habit untuk membuka Alternatifa, centang lingkaran setelah selesai.</div>'}];
   let ai = 0;
