@@ -663,6 +663,8 @@ function vNewCount(d){ const q = eff('v'+d); return VSTEPS.filter(([f]) => q[f])
 const HABITS = [['a','Anak Tangga','Habit Alternatifa'],['o','Obat Fokus','Habit Alternatifa'],['b','Balon Helium','Habit Alternatifa']];
 const HABIT_URL = 'https://www.alternatifa.com/habit';
 const RB_START = '2026-11-14';
+const DX_START = '2026-11-23'; /* mulai tanggal ini ada ceklis Daily Math, Logic, Grammar */
+const DAILY = [['m','Daily Math'],['l','Daily Logic'],['g','Daily Grammar']];
 const VRESTART = '2026-11-23'; /* vocab diulang dari TFL-P04; vocab sebelum tanggal ini tidak dihitung tertinggal */ /* mulai tanggal ini Habit diganti Ruang Baca di daftar harian */
 
 function dayRows(d){
@@ -675,6 +677,7 @@ function dayRows(d){
 }
 function dayTasks(d){
   const r = dayRows(d), v = vday(d), h = eff('h'+d), T = [];
+  if (d >= DX_START){ const q = eff('dx'+d); DAILY.forEach(([f,l]) => T.push({l, done: !!q[f]})); }
   if (d < RB_START) HABITS.forEach(([f,l]) => T.push({l, done: !!h[f]}));
   else if (pd(d).getDay()) T.push({l:'Ruang Baca', done: !!eff('rb'+d).p});
   r.materi.forEach((x,i) => T.push({l:'Materi '+(i+1), done: matBeres(x)}));
@@ -1025,6 +1028,7 @@ function vHari(){
   const acc = (q, unit) => q.q ? q.q+' '+unit+' · '+Math.round(q.b*100/q.q)+'% benar' : '';
   const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
   const S = [];
+  if (d >= DX_START){ const xq = eff('dx'+d); DAILY.forEach(([f,l]) => S.push({t:l, k:'dx'+d, f, st:xq[f] ? 'on' : ''})); }
   if (pd(d).getDay() || d < RB_START) S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : ''});
   r.materi.forEach(x => {
     const stt = matStatus(eff(x.k)), utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
@@ -1055,6 +1059,7 @@ function vHari(){
     const op = x.id && ST.open.has(x.id), on = x.st==='on';
     const rt = '<div class="rt"><div class="t">'+(x.url ? esc(x.t) : x.t)+'</div>'+(x.s ? '<div class="s">'+(x.url ? esc(x.s) : x.s)+'</div>' : '')+'</div>';
     const cls = 'row step'+(on ? ' done' : '');
+    if (x.f) return '<div class="card"><button class="'+cls+'" data-act="tog" data-k="'+x.k+'" data-f="'+x.f+'" aria-pressed="'+on+'">'+ckc(on)+rt+'</button></div>';
     if (x.url) return '<div class="card"><a class="'+cls+'" href="'+esc(x.url)+'" target="_blank" rel="noopener">'+ckc(on)+rt+'<span class="ext" aria-hidden="true">↗</span></a></div>';
     return '<div class="card'+(op?' open':'')+'"><button class="'+cls+'" data-act="exp" data-id="'+x.id+'" aria-expanded="'+op+'">'+ckc(on)+rt+'<span class="chev"></span></button>'+(op ? '<div class="xp">'+(x.inner||'')+'</div>' : '')+'</div>';
   };
