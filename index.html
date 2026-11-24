@@ -542,6 +542,10 @@ body{background:var(--wall)}
 .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;padding:12px 6px;background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop)}
 .apps a{display:grid;justify-items:center;gap:6px;text-decoration:none;color:var(--ink);font-size:11.5px;font-weight:500;line-height:1.2;text-align:center;padding:4px 2px;border-radius:12px}
 .apps a:active{background:var(--fill)}
+.wkm{margin-top:10px;padding:12px 14px;background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop)}
+.wkm-h{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}.wkm-h b{font-size:15px}.wkm-h span{font-size:12px;color:var(--ink2,#6b6b73)}
+.wkm-r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:.5px solid var(--rim);color:var(--ink);text-decoration:none;font-size:14px}
+.wkm-b{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}.wkm-b.telat{background:var(--red-soft);color:var(--red-ink)}.wkm-b.segera{background:var(--orange-soft);color:var(--orange-ink)}
 .apps .applogo{width:46px;height:46px;border-radius:12px;font-size:13px;position:relative}
 .apps a.ok .applogo::after{content:"";position:absolute;right:-4px;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 12.5l3.5 3.5 7.5-8' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/10px no-repeat;box-shadow:0 0 0 2px var(--card)}
 </style>
@@ -856,6 +860,30 @@ const APPS = [
   {id:'nalar', t:'Nalar Harian', s:'Latihan logika PU', url:'https://faiqdk07-tech.github.io/logic-games/', lg:'NH', c:'linear-gradient(135deg,#B57BFF,#7A4DE0)'}
 ];
 function readLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+/* Paket mini game mingguan (24 Nov): tiap app menulis kunci "paketMingguan:<app>" berisi daftar minggu (tanggal Senin)
+   yang paketnya sudah ditempel. Status dihitung di sini: terlambat (minggu ini belum ada), segera (Jumat–Minggu, minggu depan
+   belum ada). Kartu hanya muncul bila ada yang perlu diganti. */
+const WK_APPS = [
+  {k:'nalar-harian', t:'Nalar Harian', url:'https://faiqdk07-tech.github.io/logic-games/#mingguan'},
+  {k:'latihan-kuantitatif', t:'Latihan Kuantitatif', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/#mingguan'},
+  {k:'latihan-ppu-pbm', t:'Latihan PPU & PBM', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/#mingguan'},
+  {k:'fundamental-math', t:'Fundamental Math', url:'https://faiqdk07-tech.github.io/FUNdamental-math/#KasusBaru'}
+];
+function wkMiniStatus(today){
+  const cur = mondayOf(today), nxt = addDays(cur,7), dow = (pd(today).getDay()+6)%7;
+  return WK_APPS.map(a => { const r = readLS('paketMingguan:'+a.k);
+    if (!r || !Array.isArray(r.minggu)) return Object.assign({st:'kosong'}, a);
+    const has = m => r.minggu.includes(m);
+    return Object.assign({st: !has(cur) ? 'telat' : has(nxt) ? 'siap' : dow>=4 ? 'segera' : 'aman'}, a); });
+}
+function wkMiniCard(today){
+  const L = wkMiniStatus(today), cur = mondayOf(today), akhir = addDays(cur,6), dk = pd(akhir), tgl = dk.getDate()+' '+BULAN[dk.getMonth()];
+  const due = L.filter(x => x.st==='telat' || x.st==='segera'); if (!due.length) return '';
+  const lab = {telat:'Terlambat', segera:'Ganti sebelum Senin'};
+  return '<div class="wkm"><div class="wkm-h"><b>Paket mini game mingguan</b><span>Diganti tiap hari Minggu (minggu ini: '+tgl+'). Ketuk untuk membuka app-nya.</span></div>'+
+    due.map(x => '<a class="wkm-r" href="'+x.url+'" target="_blank" rel="noopener"><span>'+esc(x.t)+'</span><span class="wkm-b '+x.st+'">'+lab[x.st]+'</span></a>').join('')+'</div>';
+}
+
 /* salin ringkasan Latihan Kuantitatif hari ini ke data progres agar ikut tersimpan di akun */
 function syncOne(lsKey, pre){
   const r = readLS(lsKey); if (!r || !r.tanggal) return false;
@@ -983,6 +1011,7 @@ function vHari(){
 
   const at = {kuant:lkTask(d), ppu:ppTask(d)}, nm = {kuant:'Kuantitatif', ppu:'PPU & PBM', vlab:'Vocab Lab', nalar:'Nalar Harian'};
   html += '<nav class="apps" aria-label="Latihan">'+APPS.filter(x => x.id!=='rbaca').map(x => '<a href="'+x.url+'" target="_blank" rel="noopener"'+(at[x.id] && at[x.id].done ? ' class="ok"' : '')+'><span class="applogo" style="background:'+x.c+'" aria-hidden="true">'+x.lg+'</span>'+nm[x.id]+'</a>').join('')+'</nav>';
+  if (d===today) html += wkMiniCard(today);
   // isi detail tiap langkah dikumpulkan (hX lokal), lalu ditampilkan dalam satu daftar berurutan
   const XP = {};
   const hX = (id, ic, check, title, rv, inner) => { XP[id] = inner; return ''; };
