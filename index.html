@@ -683,7 +683,7 @@ function dayTasks(d){
   const r = dayRows(d), v = vday(d), h = eff('h'+d), T = [];
   if (d >= DX_START){ const q = eff('dx'+d); DAILY.forEach(([f,l]) => T.push({l, done: !!q[f]})); }
   if (d < RB_START) HABITS.forEach(([f,l]) => T.push({l, done: !!h[f]}));
-  else if (pd(d).getDay()) T.push({l:'Ruang Baca', done: !!eff('rb'+d).p});
+  else if (pd(d).getDay()) T.push({l:'Ruang Baca', done: !!(eff('rb'+d).p || eff('rb'+d).cek)});
   r.materi.forEach((x,i) => T.push({l:'Materi '+(i+1), done: matBeres(x)}));
   if (r.review.length){ const n = r.review.filter(revBeres).length; T.push({l:'Review campur', done: n===r.review.length, part: n>0}); }
   if (r.timed.length){ const n = r.timed.filter(timedBeres).length; T.push({l:'Timed drill', done: n===r.timed.length, part: n>0}); }
@@ -1058,7 +1058,7 @@ function vHari(){
   const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
   const S = [];
   if (d >= DX_START){ const xq = eff('dx'+d); DAILY.forEach(([f,l]) => S.push({t:l, k:'dx'+d, f, st:xq[f] ? 'on' : ''})); }
-  if (pd(d).getDay() || d < RB_START) S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : ''});
+  if (pd(d).getDay() || d < RB_START) S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, k:'rb'+d, f:'cek', st:(rq.p || rq.cek) ? 'on' : ''});
   r.materi.forEach(x => {
     const stt = matStatus(eff(x.k)), utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
     S.push({t:esc(x.sub)+(x.ke?' <span class="ke">'+esc(x.ke)+'</span>':''), s:esc(x.kode)+' · '+(r.arsip ? 'Basic Skills (v7)' : (utbk ? 'UTBK · '+esc(subjShort(x.subj)) : 'Matematika Dasar')+(x.ch ? ' · '+esc(x.ch) : '')), rv:stt,
