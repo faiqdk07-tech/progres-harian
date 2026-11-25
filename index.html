@@ -1348,10 +1348,20 @@ function vWeak(c){
         : '<button class="wk-t" '+(fresh?'data-act="exp" data-id="'+id+'"':'tabindex="-1"')+'><b>'+nm+'</b><span class="wk-w" id="ww-'+c.c+'-'+x.li+'">'+x.w.map(esc).join(', ')+'</span></button>')+
         '<button class="cpi" data-act="copyw" data-l="'+x.li+'" aria-label="Salin '+x.w.length+' kata">'+cp+'</button></div>'; }).join('')+'</div>';
 }
+/* paket vocab hari ini: kata baru + review, centang kata sama dengan daftar di bawah */
+function vToday(){
+  const d = todayStr(), v = vday(d), rv = vRevs(v);
+  if (!v || (!v.new && !rv.length)) return sh('Paket hari ini')+'<div class="group plain"><div class="row"><div class="rt"><div class="s">Tidak ada paket vocab hari ini</div></div></div></div>';
+  const blk = (tag, c) => { const [m,t] = paketMastery(c);
+    return '<div class="rvh" style="margin:0 0 8px"><span class="badge '+(tag==='Baru'?'b-ok':'b-0')+'">'+tag+'</span>'+code(c)+'<span class="hint" style="margin:0 0 0 auto">'+m+'/'+t+' dikuasai</span></div>'+paketChips(c); };
+  const parts = (v.new ? [blk('Baru', v.new)] : []).concat(rv.map(([hh,c]) => blk('Review '+hh, c)));
+  return sh('Paket hari ini', esc(fmtLong(d)))+'<div class="group plain"><div style="padding:14px 16px">'+parts.join('<div style="height:14px"></div>')+'</div></div>';
+}
 function vVocab(){
   const c = CAT[ST.vcat], [n,t] = catProgress(c.c);
   let html = head('Kosakata Bahasa Inggris', 'Vocab');
   html += vProgress();
+  html += '<div style="height:10px"></div>'+vToday();
   html += '<div style="height:10px"></div><div class="group plain"><div class="fr"><label for="vq" style="flex:none">Cari</label><input id="vq" type="search" autocomplete="off" placeholder="kata…" value="'+esc(ST.vq)+'" style="max-width:none;flex:1"></div></div>';
   html += sh('Daftar kata')+'<div class="group" id="vlist">'+vVocabList()+'</div>';
   html += '<div style="height:8px"></div>'+vWeak(c);
@@ -1606,6 +1616,8 @@ const Store = {
 function getTheme(){ try { return localStorage.getItem('pht.theme') || 'auto'; } catch(e){ return 'auto'; } }
 function applyTheme(t){ if (t==='light' || t==='dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
 applyTheme(getTheme());
+/* kategori vocab awal = kategori paket baru hari ini (atau paket terakhir sebelumnya) */
+{ const t = todayStr(), v = vdays().filter(x => x.new && x.d <= t).pop(); if (v && DATA.paket[v.new]) ST.vcat = DATA.paket[v.new].c; }
 ST.date = (() => { const t = todayStr(); return t < FIRST ? FIRST : t > LAST ? LAST : t; })();
 window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState!=='visible') return; if ($('#errForm')){ saveDraft(); syncLatihan(); return; } render(); });
