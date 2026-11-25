@@ -542,6 +542,10 @@ body{background:var(--wall)}
 .apps{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:10px;padding:12px 6px;background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop)}
 .apps a{display:grid;justify-items:center;gap:6px;text-decoration:none;color:var(--ink);font-size:11.5px;font-weight:500;line-height:1.2;text-align:center;padding:4px 2px;border-radius:12px}
 .apps a:active{background:var(--fill)}
+.wkm{margin-top:10px;padding:12px 14px;background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 .5px var(--rim),0 2px 10px var(--drop)}
+.wkm-h{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}.wkm-h b{font-size:15px}.wkm-h span{font-size:12px;color:var(--ink2,#6b6b73)}
+.wkm-r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:.5px solid var(--rim);color:var(--ink);text-decoration:none;font-size:14px}
+.wkm-b{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}.wkm-b.telat{background:var(--red-soft);color:var(--red-ink)}.wkm-b.segera{background:var(--orange-soft);color:var(--orange-ink)}
 .apps .applogo{width:46px;height:46px;border-radius:12px;font-size:13px;position:relative}
 .apps a.ok .applogo::after{content:"";position:absolute;right:-4px;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.5 12.5l3.5 3.5 7.5-8' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/10px no-repeat;box-shadow:0 0 0 2px var(--card)}
 </style>
@@ -679,7 +683,7 @@ function dayTasks(d){
   const r = dayRows(d), v = vday(d), h = eff('h'+d), T = [];
   if (d >= DX_START){ const q = eff('dx'+d); DAILY.forEach(([f,l]) => T.push({l, done: !!q[f]})); }
   if (d < RB_START) HABITS.forEach(([f,l]) => T.push({l, done: !!h[f]}));
-  else if (pd(d).getDay()) T.push({l:'Ruang Baca', done: !!eff('rb'+d).p});
+  else if (pd(d).getDay()) T.push({l:'Ruang Baca', done: !!(eff('rb'+d).p || eff('rb'+d).cek)});
   r.materi.forEach((x,i) => T.push({l:'Materi '+(i+1), done: matBeres(x)}));
   if (r.review.length){ const n = r.review.filter(revBeres).length; T.push({l:'Review campur', done: n===r.review.length, part: n>0}); }
   if (r.timed.length){ const n = r.timed.filter(timedBeres).length; T.push({l:'Timed drill', done: n===r.timed.length, part: n>0}); }
@@ -856,6 +860,30 @@ const APPS = [
   {id:'nalar', t:'Nalar Harian', s:'Latihan logika PU', url:'https://faiqdk07-tech.github.io/logic-games/', lg:'NH', c:'linear-gradient(135deg,#B57BFF,#7A4DE0)'}
 ];
 function readLS(k){ try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch(e){ return null; } }
+/* Paket mini game mingguan (24 Nov): tiap app menulis kunci "paketMingguan:<app>" berisi daftar minggu (tanggal Senin)
+   yang paketnya sudah ditempel. Status dihitung di sini: terlambat (minggu ini belum ada), segera (Jumat–Minggu, minggu depan
+   belum ada). Kartu hanya muncul bila ada yang perlu diganti. */
+const WK_APPS = [
+  {k:'nalar-harian', t:'Nalar Harian', url:'https://faiqdk07-tech.github.io/logic-games/#mingguan'},
+  {k:'latihan-kuantitatif', t:'Latihan Kuantitatif', url:'https://faiqdk07-tech.github.io/latihan-kuantitatif/#mingguan'},
+  {k:'latihan-ppu-pbm', t:'Latihan PPU & PBM', url:'https://faiqdk07-tech.github.io/latihan-ppu-pbm/#mingguan'},
+  {k:'fundamental-math', t:'Fundamental Math', url:'https://faiqdk07-tech.github.io/FUNdamental-math/#KasusBaru'}
+];
+function wkMiniStatus(today){
+  const cur = mondayOf(today), nxt = addDays(cur,7), dow = (pd(today).getDay()+6)%7;
+  return WK_APPS.map(a => { const r = readLS('paketMingguan:'+a.k);
+    if (!r || !Array.isArray(r.minggu)) return Object.assign({st:'kosong'}, a);
+    const has = m => r.minggu.includes(m);
+    return Object.assign({st: !has(cur) ? 'telat' : has(nxt) ? 'siap' : dow>=4 ? 'segera' : 'aman'}, a); });
+}
+function wkMiniCard(today){
+  const L = wkMiniStatus(today), cur = mondayOf(today), akhir = addDays(cur,6), dk = pd(akhir), tgl = dk.getDate()+' '+BULAN[dk.getMonth()];
+  const due = L.filter(x => x.st==='telat' || x.st==='segera'); if (!due.length) return '';
+  const lab = {telat:'Terlambat', segera:'Ganti sebelum Senin'};
+  return '<div class="wkm"><div class="wkm-h"><b>Paket mini game mingguan</b><span>Diganti tiap hari Minggu (minggu ini: '+tgl+'). Ketuk untuk membuka app-nya.</span></div>'+
+    due.map(x => '<a class="wkm-r" href="'+x.url+'" target="_blank" rel="noopener"><span>'+esc(x.t)+'</span><span class="wkm-b '+x.st+'">'+lab[x.st]+'</span></a>').join('')+'</div>';
+}
+
 /* salin ringkasan Latihan Kuantitatif hari ini ke data progres agar ikut tersimpan di akun */
 function syncOne(lsKey, pre){
   const r = readLS(lsKey); if (!r || !r.tanggal) return false;
@@ -983,6 +1011,7 @@ function vHari(){
 
   const at = {kuant:lkTask(d), ppu:ppTask(d)}, nm = {kuant:'Kuantitatif', ppu:'PPU & PBM', vlab:'Vocab Lab', nalar:'Nalar Harian'};
   html += '<nav class="apps" aria-label="Latihan">'+APPS.filter(x => x.id!=='rbaca').map(x => '<a href="'+x.url+'" target="_blank" rel="noopener"'+(at[x.id] && at[x.id].done ? ' class="ok"' : '')+'><span class="applogo" style="background:'+x.c+'" aria-hidden="true">'+x.lg+'</span>'+nm[x.id]+'</a>').join('')+'</nav>';
+  if (d===today) html += wkMiniCard(today);
   // isi detail tiap langkah dikumpulkan (hX lokal), lalu ditampilkan dalam satu daftar berurutan
   const XP = {};
   const hX = (id, ic, check, title, rv, inner) => { XP[id] = inner; return ''; };
@@ -1029,7 +1058,7 @@ function vHari(){
   const cnt = (q, task) => q.n ? q.s+'/'+q.n : task ? '0/5' : '';
   const S = [];
   if (d >= DX_START){ const xq = eff('dx'+d); DAILY.forEach(([f,l]) => S.push({t:l, k:'dx'+d, f, st:xq[f] ? 'on' : ''})); }
-  if (pd(d).getDay() || d < RB_START) S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, url:APPS[3].url, st:rq.p ? 'on' : ''});
+  if (pd(d).getDay() || d < RB_START) S.push({t:'Ruang Baca', s:rq.p ? rq.q+' soal · '+Math.round(rq.b*100/rq.q)+'% benar' : APPS[3].s, k:'rb'+d, f:'cek', st:(rq.p || rq.cek) ? 'on' : ''});
   r.materi.forEach(x => {
     const stt = matStatus(eff(x.k)), utbk = x.subj && !/^(Mat|Verbal)/.test(x.subj);
     S.push({t:esc(x.sub)+(x.ke?' <span class="ke">'+esc(x.ke)+'</span>':''), s:esc(x.kode)+' · '+(r.arsip ? 'Basic Skills (v7)' : (utbk ? 'UTBK · '+esc(subjShort(x.subj)) : 'Matematika Dasar')+(x.ch ? ' · '+esc(x.ch) : '')), rv:stt,
@@ -1586,5 +1615,73 @@ ST.view = viewFromHash();
 Store.init();
 </script>
 
+<!-- Tarik untuk muat ulang (24 Nov 2026): app yang dibuka dari Layar Utama iPad tidak punya tombol refresh.
+     Tarik layar ke bawah saat sudah di paling atas, lalu lepas. Tidak aktif di atas kolom isian atau saat menyeret benda. -->
+<style>
+#ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 6px);z-index:2147483000;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;font:600 13px/1.2 system-ui,-apple-system,sans-serif;color:var(--ptr-fg,#1f2430);background:var(--ptr-bg,#fff);border:var(--ptr-bd,1px solid rgba(0,0,0,.12));border-radius:var(--ptr-r,999px);box-shadow:var(--ptr-sh,0 4px 14px rgba(0,0,0,.14));pointer-events:none;opacity:0;transform:translate(-50%,-70px);white-space:nowrap}
+#ptr svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#ptr.ptr-go svg{animation:ptr-spin .8s linear infinite}
+@keyframes ptr-spin{to{transform:rotate(360deg)}}
+</style>
+<script>
+(function(){
+  var PULL = 80;   // jarak tarik (setelah diperlambat) untuk memuat ulang
+  var SKIP = 'input,textarea,select,canvas,[contenteditable],[draggable="true"],[data-no-ptr]';
+  var el, sy = 0, sx = 0, d = 0, armed = false, busy = false;
+  function box(){
+    if (el) return el;
+    el = document.createElement('div'); el.id = 'ptr'; el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg><span></span>';
+    document.body.appendChild(el); return el;
+  }
+  function show(p){
+    var b = box(), r = Math.min(p / PULL, 1);
+    b.style.opacity = Math.min(1, p / 30);
+    b.style.transform = 'translate(-50%,' + (Math.min(p, PULL + 20) - 60) + 'px)';
+    b.querySelector('svg').style.transform = 'rotate(' + Math.round(r * 300) + 'deg)';
+    b.lastChild.textContent = r >= 1 ? 'Lepas untuk muat ulang' : 'Tarik untuk muat ulang';
+  }
+  function hide(){ if (el){ el.style.opacity = 0; el.style.transform = 'translate(-50%,-70px)'; } }
+  function atTop(t){
+    if ((window.scrollY || document.documentElement.scrollTop || 0) > 0) return false;
+    for (var n = t; n && n !== document.documentElement; n = n.parentElement){
+      if (n.nodeType !== 1) continue;
+      if (n.scrollTop > 0) return false;
+      var ta = getComputedStyle(n).touchAction;
+      if (ta && ta !== 'auto' && ta !== 'manipulation' && ta.indexOf('pan-y') < 0) return false; // area seret/gambar
+    }
+    return true;
+  }
+  addEventListener('touchstart', function(e){
+    armed = false; d = 0;
+    if (busy || e.touches.length !== 1) return;
+    var t = e.target;
+    if (t.closest && t.closest(SKIP)) return;
+    if (!atTop(t)) return;
+    armed = true; sy = e.touches[0].clientY; sx = e.touches[0].clientX;
+  }, {passive: true});
+  addEventListener('touchmove', function(e){
+    if (!armed) return;
+    if (e.defaultPrevented || e.touches.length !== 1){ armed = false; hide(); return; } // game sedang memakai gerakan ini
+    var dy = e.touches[0].clientY - sy, dx = e.touches[0].clientX - sx;
+    if (dy <= 0 || Math.abs(dx) > dy){ if (d === 0 && (dy < -4 || Math.abs(dx) > 10)) armed = false; d = 0; hide(); return; }
+    d = dy * 0.5; show(d);
+  }, {passive: true});
+  function end(){
+    if (!armed) return; armed = false;
+    if (d >= PULL){ reload(); } else hide();
+    d = 0;
+  }
+  addEventListener('touchend', end, {passive: true});
+  addEventListener('touchcancel', function(){ armed = false; d = 0; hide(); }, {passive: true});
+  function reload(){
+    busy = true; var b = box(); b.classList.add('ptr-go');
+    b.style.opacity = 1; b.style.transform = 'translate(-50%,0)'; b.lastChild.textContent = 'Memuat ulang…';
+    var pre = window.PTR_BEFORE_RELOAD, go = function(){ location.reload(); };
+    try { if (pre) { Promise.race([Promise.resolve(pre()), new Promise(function(r){ setTimeout(r, 4000); })]).then(go, go); return; } } catch (e) {}
+    setTimeout(go, 150);
+  }
+})();
+</script>
 </body>
 </html>
